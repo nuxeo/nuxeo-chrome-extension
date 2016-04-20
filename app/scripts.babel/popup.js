@@ -47,6 +47,7 @@ $(document).ready(function() {
   function getJsonFromPath(input) {
     nuxeo.request('/path/' + input)
       .schemas('*')
+      .enrichers({ document: ['acls', 'permissions'] })
       .get()
       .then(openJsonWindow)
       .catch(function(error) {
@@ -57,6 +58,7 @@ $(document).ready(function() {
   function getJsonFromGuid(input) {
     nuxeo.request('/id/' + input)
       .schemas('*')
+      .enrichers({ document: ['acls', 'permissions'] })
       .get()
       .then(openJsonWindow)
       .catch(function(error) {
