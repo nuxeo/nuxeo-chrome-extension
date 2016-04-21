@@ -18,15 +18,29 @@
     -->
     <meta charset="utf-8">
     <title>Nuxeo Extension Popup</title>
-    <style type="text/css"></style>
+
     <!-- build:css styles/popup-vendor.css -->
-    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- bower:css -->
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- endbower -->
     <!-- endbuild -->
+
     <!-- build:css styles/main.css -->
     <link href="styles/main.css" rel="stylesheet">
     <link href="styles/nuxeo.css" rel="stylesheet">
+    <!-- endbuild -->
+
+    <!-- build:js scripts/popup-vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/nuxeo/dist/nuxeo.js"></script>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/jquery-confirm/jquery.confirm.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:js scripts/popup.js -->
+    <script src="scripts/popup.js"></script>
     <!-- endbuild -->
   </head>
   <body>
@@ -161,17 +175,5 @@
     </div>
     <div id="loading">
     </div>
-    <!-- build:js scripts/popup-vendor.js -->
-    <!-- bower:js -->
-    <script src="bower_components/nuxeo/dist/nuxeo.js"></script>
-    <script src="bower_components/jquery/dist/jquery.js"></script>
-    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="bower_components/jquery-confirm/jquery.confirm.js"></script>
-    <!-- endbower -->
-    <!-- endbuild -->
-
-    <!-- build:js scripts/popup.js -->
-    <script src="scripts/popup.js"></script>
-    <!-- endbuild -->
   </body>
 </html>
