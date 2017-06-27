@@ -28,7 +28,8 @@
 		"background",
 		"declarativeContent",
 		"<all_urls>",
-		"webRequest"
+		"webRequest",
+		"https://app.prodpad.com/"
 	],
 	"omnibox": {
 		"keyword": "OMNIBOX-KEYWORD"
