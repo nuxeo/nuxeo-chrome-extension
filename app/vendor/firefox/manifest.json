@@ -16,7 +16,7 @@
 	},
 	"background": {
 		"scripts": [
-			"../../../node_modules/nuxeo/dist/nuxeo.js",
+			"../../../node_modules/nuxeo/nuxeo.js",
 			"../../../app/vendor/firefox/ff-bkg.js",
 			"../../../app/scripts/bkg.js"
 		]

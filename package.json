@@ -54,6 +54,6 @@
     }
   },
   "dependencies": {
-    "nuxeo": "2.0.0"
+    "nuxeo": "3.0.1"
   }
 }

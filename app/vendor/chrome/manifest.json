@@ -11,7 +11,7 @@
 	"default_locale": "en",
 	"background": {
 		"scripts": [
-			"../../../node_modules/nuxeo/dist/nuxeo.js",
+			"../../../node_modules/nuxeo/nuxeo.js",
 			"../../../app/vendor/chrome/chrome-bkg.js",
 			"../../../app/scripts/bkg.js"
 		],
