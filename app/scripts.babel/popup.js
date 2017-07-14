@@ -94,7 +94,7 @@ limitations under the License.
     };
 
     function checkStudioProject(nuxeo) {
-      let script = `import groovy.json.JsonOutput;
+      const script = `import groovy.json.JsonOutput;
       import org.nuxeo.connect.packages.PackageManager;
       import org.nuxeo.connect.client.we.StudioSnapshotHelper;
       import org.nuxeo.ecm.admin.runtime.RuntimeInstrospection;
@@ -119,13 +119,13 @@ limitations under the License.
       }).input(blob).execute().then((res) => {
         return res.text();
       }).then((text) => {
-        var json = JSON.parse(text);
-        pkgName = json['studio'];
-        var studioUrl = ('https://connect.nuxeo.com/nuxeo/site/studio/ide?project=').concat(pkgName);
+        const pkgName = JSON.parse(text).studio;
         if (pkgName) {
           $('#studio-link-button, #hot-reload-button').attr('class', 'button main-page');
           $('#studio-link-button').click(function() {
             _gaq.push(['_trackEvent', 'studio-link-button', 'clicked']);
+
+            const studioUrl = `https://connect.nuxeo.com/nuxeo/site/studio/ide?project=${pkgName}`;
 						app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
           });
           $('#hot-reload-button').click(function() {
