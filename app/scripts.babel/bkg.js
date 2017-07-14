@@ -14,11 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+const nxPattern = /(^https?:\/\/[A-Za-z_\.0-9:-]+\/[A-Za-z_\.0-9-]+\/)(?:(?:nxdoc|nxpath|nxsearch|nxadmin|nxhome|nxdam|nxdamid|site\/[A-Za-z_\.0-9-]+)\/[A-Za-z_\.0-9-]+|view_documents\.faces|ui\/#!\/\w+\/?|view_domains\.faces|view_home\.faces)/;
 
 var window = window || {};
 var studioExt = window.studioExt = window.studioExt || {};
 
-function notification(idP, titleP, messageP, img) {
+const notification = window.notification = (idP, titleP, messageP, img) => {
   chrome.notifications.create(idP, {
     type: 'basic',
     title: titleP,
@@ -29,24 +30,23 @@ function notification(idP, titleP, messageP, img) {
   });
 };
 
-function getCurrentTabUrl(callback) {
+const getCurrentTabUrl = window.getCurrentTabUrl = (callback) => {
   var queryInfo = {
     active: true,
     currentWindow: true
   };
 
   chrome.tabs.query(queryInfo, function(tabs) {
-    var url;
-    var tab = tabs[0];
-    tabUrl = tab.url;
-    var nxPattern = /(^https?:\/\/[A-Za-z_\.0-9:-]+\/[A-Za-z_\.0-9-]+\/)(?:(?:nxdoc|nxpath|nxsearch|nxadmin|nxhome|nxdam|nxdamid|site\/[A-Za-z_\.0-9-]+)\/[A-Za-z_\.0-9-]+|view_documents\.faces|ui\/#!\/\w+\/?|view_domains\.faces|view_home\.faces)/;
-    var matchGroup = nxPattern.exec(tabUrl);
-    url = matchGroup[1];
-    console.assert(typeof url === 'string', 'tab.url should be a string');
+    const [tab] = tabs;
+    const matchGroups = nxPattern.exec(tab.url);
+    if (!matchGroups) {
+      callback(null)
+      return;
+    }
 
-
+    const [,url] = matchGroups;
     window.studioExt.server = {
-      url: url,
+      url,
       tabId: tab.id
     }
 
