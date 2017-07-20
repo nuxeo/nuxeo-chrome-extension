@@ -1,9 +1,10 @@
 module.exports = function () {
-  this.Given(/^the extension open(?: as ([Ff]irefox|[Cc]hrome))?/, (build = 'sinon-chrome') => {
+  this.Given(/^the extension open(?: as ([Ff]irefox|[Cc]hrome))?/, (arg) => {
     // Object.keys(global).forEach(k => console.log(k));
+    const dist = arg || 'sinon-chrome';
 
     // Open Popup in the current Window
-    const url = `file:///${__dirname}/../../../dist/${build.toLowerCase()}/popup.html`
+    const url = `file:///${__dirname}/../../../dist/${dist.toLowerCase()}/popup.html`
     browser.url(url);
 
     // http://chaijs.com/api/bdd/
@@ -30,11 +31,16 @@ module.exports = function () {
   });
 
   this.Then(/Server responds with (\d+) documents?/, (size) => {
-    expect(browser.$('#json-search-results').$$('.search-result').length).to.be.equals(size)
+    expect(browser.$('#json-search-results').$$('.search-result').length).to.be.equals(Number.parseInt(size));
   });
 
   this.Then(/Document (\d+) title is (.+) and parent path (.+)/, (index, title, parentPath) => {
-    console.log(`${index} - ${title} - ${parentPath}`);
+    const trs = browser.$$('#json-search-results tbody tr');
+    const trTitle = trs[index - 1];
+    const trPath = trs[index];
+
+    expect(trTitle.$('.doc-title').getText()).to.be.equals(title);
+    expect(trPath.$('.doc-path').getText()).to.be.equals(parentPath);
   });
 
 }
