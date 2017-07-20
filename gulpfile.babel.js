@@ -170,7 +170,7 @@ gulp.task('clean', () => {
   return del.sync(['.tmp', 'dist', 'package']);
 });
 
-gulp.task('watch', ['lint', 'babel', 'html', 'chrome', 'firefox', 'extras'], () => {
+gulp.task('watch', ['lint', 'babel', 'html', 'vendor:chrome', 'vendor:firefox', 'extras'], () => {
   $.livereload.listen();
 
 	gulp.src('app/vendor/chrome/manifest.json')
@@ -197,7 +197,10 @@ gulp.task('watch', ['lint', 'babel', 'html', 'chrome', 'firefox', 'extras'], () 
     'app/styles/**/*',
     'app/_locales/**/*.json',
     'app/vendor/**/*'
-  ]).on('change', $.livereload.reload);
+  ]).on('change', function() {
+		gulp.start('build');
+		$.livereload.reload;
+	});
 
   gulp.watch('app/scripts.babel/**/*.js', ['lint', 'babel']);
   gulp.watch('bower.json', ['wiredep']);
