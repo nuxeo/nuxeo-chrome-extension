@@ -3,6 +3,11 @@ function escapeHTML(str) {
 }
 escapeHTML.replacements = { '&': '&amp;', '"': '&quot;', '\'': '&#39;', '<': '&lt;', '>': '&gt;' };
 
+function updateCopyright() {
+  var date = new Date().getFullYear();
+  $('#copyright').html('&#169; ' + date + ' Nuxeo');
+}
+
 $.ajax({
   method: 'GET',
   url: 'manifest.json',
@@ -11,5 +16,6 @@ $.ajax({
   success: function(data){
     var version = escapeHTML(data.version);
     $('#version').html(version);
+    updateCopyright();
   }
 });
