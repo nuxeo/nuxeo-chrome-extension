@@ -58,7 +58,7 @@ exports.config = {
   sync: true,
   //
   // Level of logging verbosity: silent | verbose | command | data | result | error
-  logLevel: 'verbose',
+  logLevel: 'silent',
   //
   // Enables colors for log output.
   coloredLogs: true,
@@ -68,11 +68,11 @@ exports.config = {
   bail: 0,
   //
   // Saves a screenshot to a given path if a command fails.
-  screenshotPath: './test/screenshots',
+  screenshotPath: './target/screenshots',
   //
   // Set a base URL in order to shorten url command calls. If your url parameter starts
   // with "/", then the base url gets prepended.
-  baseUrl: 'http://localhost',
+  baseUrl: 'http://localhost:8080/',
   //
   // Default timeout for all waitFor* commands.
   waitforTimeout: 10000,
@@ -189,16 +189,14 @@ exports.config = {
    * Hook that gets executed before the suite starts
    * @param {Object} suite suite details
    */
-  beforeSuite: function (suite) {
-    console.log('beforeSuite');
-  },
+  // beforeSuite: function (suite) {
+  // },
   /**
    * Hook that gets executed _before_ a hook within the suite starts (e.g. runs before calling
    * beforeEach in Mocha)
    */
-  beforeHook: function () {
-    console.log('beforeHook');
-  },
+  // beforeHook: function () {
+  // },
   /**
    * Hook that gets executed _after_ a hook within the suite starts (e.g. runs after calling
    * afterEach in Mocha)
@@ -246,8 +244,18 @@ exports.config = {
    * @param {Array.<Object>} capabilities list of capabilities details
    * @param {Array.<String>} specs List of spec file paths that ran
    */
-  // after: function (result, capabilities, specs) {
-  // },
+  after: function (result, capabilities, specs) {
+    const logs = browser.log('browser');
+    if (logs.value.length === 0) {
+      return;
+    }
+
+    console.error('Browser Logs:');
+    logs.value.forEach((l) => {
+      console.error(`${new Date(l.timestamp).toISOString()} [${l.level}] ${l.message}`);
+    });
+    console.error('-------------');
+  },
   /**
    * Gets executed right after terminating the webdriver session.
    * @param {Object} config wdio configuration object
