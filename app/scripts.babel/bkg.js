@@ -30,6 +30,18 @@ const notification = window.notification = (idP, titleP, messageP, img) => {
   });
 };
 
+/**
+ * XXX Temp solution in order to be able to force Auth
+ */
+const newNuxeo = window.newNuxeo = (opts) => {
+  const _opts = opts || {};
+  if (window.app.auth) {
+    _opts.auth = window.app.auth;
+  }
+
+  return new Nuxeo(_opts);
+}
+
 const getCurrentTabUrl = window.getCurrentTabUrl = (callback) => {
   var queryInfo = {
     active: true,
@@ -57,7 +69,7 @@ const getCurrentTabUrl = window.getCurrentTabUrl = (callback) => {
 window.bkgHotReload = function(startLoading, stopLoading) {
   var nuxeo;
   getCurrentTabUrl(function(url) {
-    nuxeo = new Nuxeo({
+    nuxeo = newNuxeo({
       baseURL: url
     });
     startLoading();
@@ -89,7 +101,7 @@ window.bkgHotReload = function(startLoading, stopLoading) {
 window.restart = function(startLoadingRS, stopLoading) {
     var nuxeo;
     getCurrentTabUrl(function(url) {
-      nuxeo = new Nuxeo({
+      nuxeo = newNuxeo({
         baseURL: url
       });
       startLoadingRS();
@@ -117,7 +129,7 @@ window.restart = function(startLoadingRS, stopLoading) {
 window.reindex = function() {
   var nuxeo;
   getCurrentTabUrl(function(url) {
-    nuxeo = new Nuxeo({
+    nuxeo = newNuxeo({
       baseURL: url
     });
     nuxeo.operation('Elasticsearch.Index').execute()
@@ -134,7 +146,7 @@ window.reindex = function() {
 window.reindexNXQL = function(input) {
   var nuxeo;
   getCurrentTabUrl(function(url) {
-    nuxeo = new Nuxeo({
+    nuxeo = newNuxeo({
       baseURL: url
     });
     nuxeo.operation('Elasticsearch.Index')
@@ -155,7 +167,7 @@ window.reindexNXQL = function(input) {
 window.reindexDocId = function(input) {
   var nuxeo;
   getCurrentTabUrl(function(url) {
-    nuxeo = new Nuxeo({
+    nuxeo = newNuxeo({
       baseURL: url
     });
     nuxeo.operation('Elasticsearch.Index')

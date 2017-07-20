@@ -285,8 +285,7 @@ gulp.task('build:sinon-chrome', ['build:chrome'], () => {
     .pipe(gulp.dest(dist(target)));
 
   // Add sinon-chrome.min script
-  //gulp.src(require.resolve('sinon-chrome/bundle/sinon-chrome.min.js'))
-  gulp.src(require.resolve('sinon-chrome/bundle/sinon-chrome-webextensions.min.js'))
+  gulp.src(require.resolve('sinon-chrome/bundle/sinon-chrome.min.js'))
     .pipe(gulp.dest(dist(target, 'scripts')))
 
   // Transpile and Copy injecter.js script

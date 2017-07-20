@@ -42,5 +42,4 @@ module.exports = function () {
     expect(trTitle.$('.doc-title').getText()).to.be.equals(title);
     expect(trPath.$('.doc-path').getText()).to.be.equals(parentPath);
   });
-
 }

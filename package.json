@@ -64,9 +64,10 @@
   "scripts": {
     "build": "gulp build",
     "pretest": "gulp build:sinon-chrome",
-    "test": "chimp test/chimp.conf.js"
+    "test": "npm run chimp -- test/chimp.conf.js",
+    "chimp": "chimp"
   },
   "dependencies": {
-    "nuxeo": "3.0.1"
+    "nuxeo": "3.2.1"
   }
 }

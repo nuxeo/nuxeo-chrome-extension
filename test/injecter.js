@@ -7,5 +7,15 @@ chrome.tabs.query.yields([{
 // Background.js is injected inside base page, so those methods are accessible from window object
 chrome.runtime.getBackgroundPage.yields(window);
 
+// Force Basic Auth on all Nuxeo Request
+
+window.app = {
+  auth: {
+    method: 'basic',
+    username: 'Administrator',
+    password: 'Administrator'
+  }
+};
+
 // Add some line to parse and eval a query parameter.
 // XXX TODO
