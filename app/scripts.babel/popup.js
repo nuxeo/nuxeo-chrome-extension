@@ -160,7 +160,7 @@ limitations under the License.
       var nuxeo;
       bkg.getCurrentTabUrl(function(url) {
 
-        nuxeo = window.newNuxeo({
+        nuxeo = bck.newNuxeo({
           baseURL: url
         });
 
