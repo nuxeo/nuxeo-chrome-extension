@@ -62,9 +62,10 @@
     }
   },
   "scripts": {
+    "postinstall": "bower install",
     "build": "gulp build",
-    "pretest": "gulp clean build:sinon-chrome",
     "test": "npm run chimp -- test/chimp.conf.js",
+    "prechimp": "gulp clean build:sinon-chrome",
     "chimp": "chimp"
   },
   "dependencies": {

@@ -20,7 +20,7 @@ module.exports = function () {
   });
 
   this.Then('I wait until $selector is not empty', (selector) => {
-    browser.waitForExist(`${selector} > *`, 2000);
+    browser.waitForExist(`${selector} > *`);
     browser.screenshot();
   });
 

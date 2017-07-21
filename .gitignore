@@ -6,4 +6,5 @@ dist
 bower_components
 package
 app/scripts
-
+npm-debug.log
+target
