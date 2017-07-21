@@ -189,8 +189,7 @@ BUTTONS
   margin-left: 10px;
 }
 
-a.button,
-a.inactive-button {
+a.button {
   text-decoration: none;
   border: 0 none;
   border-radius: 24px;
@@ -225,11 +224,6 @@ a.button {
   cursor: pointer;
 }
 
-a.inactive-button {
-  background: #ddd;
-  cursor: default;
-}
-
 a.useful-link {
   cursor: pointer;
 }
@@ -257,6 +251,25 @@ a.button:active {
 .reindex-es,
 .api-play {
   margin-left: 30px;
+}
+
+#message {
+  animation: blinker 2s linear infinite;
+  margin-left: 90px;
+}
+
+@keyframes blinker {
+  50% { opacity: 0; }
+}
+
+#nopkg {
+  margin-left: 100px;
+  display: none;
+}
+
+#hot-reload-button,
+#studio-link-button {
+  display: none;
 }
 
 #loading {

@@ -119,7 +119,8 @@ limitations under the License.
         bkg.readStudioProject((text) => {
           const pkgName = JSON.parse(text).studio;
           if (pkgName) {
-            $('#studio-link-button, #hot-reload-button').attr('class', 'button main-page');
+						$('#message').css('display', 'none');
+	          $('#studio-link-button, #hot-reload-button').css('display', 'flex');
             $('#studio-link-button').click(function() {
               _gaq.push(['_trackEvent', 'studio-link-button', 'clicked']);
 
@@ -130,6 +131,12 @@ limitations under the License.
               bkg.bkgHotReload(startLoadingHR, stopLoading);
             });
           } else {
+						$('#studio-link-button, #hot-reload-button').css('display', 'none');
+						$('#message').css('display', 'none');
+						$('#nopkg').css('display', 'block');
+						setTimeout(function() {
+					    $('#nopkg').fadeOut('fast');
+						}, 2000);
             $('#studio-link-button, #hot-reload-button').click(function() {
               bkg.notification('no_studio_project', 'No associated Studio project', 'If you\'d like to use this function, please associate your Nuxeo server with a studio project' , '../images/access_denied.png');
             });
