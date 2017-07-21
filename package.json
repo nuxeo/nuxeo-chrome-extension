@@ -63,7 +63,7 @@
   },
   "scripts": {
     "build": "gulp build",
-    "pretest": "gulp build:sinon-chrome",
+    "pretest": "gulp clean build:sinon-chrome",
     "test": "npm run chimp -- test/chimp.conf.js",
     "chimp": "chimp"
   },
