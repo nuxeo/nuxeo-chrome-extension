@@ -43,6 +43,12 @@ const newNuxeo = window.newNuxeo = (opts) => {
   return new Nuxeo(_opts);
 }
 
+const newDefaultNuxeo = () => {
+  return newNuxeo({
+    baseURL: window.studioExt.server.url
+  });
+}
+
 const getCurrentTabUrl = window.getCurrentTabUrl = (callback) => {
   var queryInfo = {
     active: true,
@@ -64,6 +70,37 @@ const getCurrentTabUrl = window.getCurrentTabUrl = (callback) => {
     }
 
     callback(url);
+  });
+};
+
+window.readStudioProject = (callback) => {
+  const script = `import groovy.json.JsonOutput;
+  import org.nuxeo.connect.packages.PackageManager;
+  import org.nuxeo.connect.client.we.StudioSnapshotHelper;
+  import org.nuxeo.ecm.admin.runtime.RuntimeInstrospection;
+  import org.nuxeo.runtime.api.Framework;
+
+  def pm = Framework.getLocalService(PackageManager.class);
+  def snapshotPkg = StudioSnapshotHelper.getSnapshot(pm.listRemoteAssociatedStudioPackages());
+  def pkgName = snapshotPkg == null ? null : snapshotPkg.getName();
+  def bundles = RuntimeInstrospection.getInfo();
+
+  println JsonOutput.toJson([studio: pkgName]);`;
+
+  const blob = new Nuxeo.Blob({
+    content: new Blob([script], {
+      type: 'text/plain'
+    }),
+    name: 'readPackage.groovy',
+    mymeType: 'text/plain'
+  });
+
+  newDefaultNuxeo().operation('RunInputScript').params({
+    type: 'groovy'
+  }).input(blob).execute().then((res) => {
+    return res.text();
+  }).then(callback).catch((e) => {
+    console.error(e);
   });
 };
 

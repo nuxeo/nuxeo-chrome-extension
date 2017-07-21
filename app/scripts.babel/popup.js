@@ -93,54 +93,6 @@ limitations under the License.
       });
     };
 
-    function checkStudioProject(nuxeo) {
-      const script = `import groovy.json.JsonOutput;
-      import org.nuxeo.connect.packages.PackageManager;
-      import org.nuxeo.connect.client.we.StudioSnapshotHelper;
-      import org.nuxeo.ecm.admin.runtime.RuntimeInstrospection;
-      import org.nuxeo.runtime.api.Framework;
-
-      def pm = Framework.getLocalService(PackageManager.class);
-      def snapshotPkg = StudioSnapshotHelper.getSnapshot(pm.listRemoteAssociatedStudioPackages());
-      def pkgName = snapshotPkg == null ? null : snapshotPkg.getName();
-      def bundles = RuntimeInstrospection.getInfo();
-
-      println JsonOutput.toJson([studio: pkgName, bundles: bundles]);`;
-
-      let blob = new Nuxeo.Blob({
-        content: new Blob([script]),
-        name: 'script',
-        type: 'text/plain',
-        size: script.length
-      });
-
-      nuxeo.operation('RunInputScript').params({
-        type: 'groovy'
-      }).input(blob).execute().then((res) => {
-        return res.text();
-      }).then((text) => {
-        const pkgName = JSON.parse(text).studio;
-        if (pkgName) {
-          $('#studio-link-button, #hot-reload-button').attr('class', 'button main-page');
-          $('#studio-link-button').click(function() {
-            _gaq.push(['_trackEvent', 'studio-link-button', 'clicked']);
-
-            const studioUrl = `https://connect.nuxeo.com/nuxeo/site/studio/ide?project=${pkgName}`;
-						app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
-          });
-          $('#hot-reload-button').click(function() {
-            bkg.bkgHotReload(startLoadingHR, stopLoading);
-          });
-        } else {
-          $('#studio-link-button, #hot-reload-button').click(function() {
-            bkg.notification('no_studio_project', 'No associated Studio project', 'If you\'d like to use this function, please associate your Nuxeo server with a studio project' , '../images/access_denied.png');
-          });
-        }
-      }).catch((e) => {
-        console.log(e);
-      })
-    };
-
     $(document).ready(function() {
 
       $('#json-searchclear').click(function(){
@@ -164,7 +116,25 @@ limitations under the License.
           baseURL: url
         });
 
-        checkStudioProject(nuxeo);
+        bkg.readStudioProject((text) => {
+          const pkgName = JSON.parse(text).studio;
+          if (pkgName) {
+            $('#studio-link-button, #hot-reload-button').attr('class', 'button main-page');
+            $('#studio-link-button').click(function() {
+              _gaq.push(['_trackEvent', 'studio-link-button', 'clicked']);
+
+              const studioUrl = `https://connect.nuxeo.com/nuxeo/site/studio/ide?project=${pkgName}`;
+              app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
+            });
+            $('#hot-reload-button').click(function() {
+              bkg.bkgHotReload(startLoadingHR, stopLoading);
+            });
+          } else {
+            $('#studio-link-button, #hot-reload-button').click(function() {
+              bkg.notification('no_studio_project', 'No associated Studio project', 'If you\'d like to use this function, please associate your Nuxeo server with a studio project' , '../images/access_denied.png');
+            });
+          }
+        });
 
         nuxeo.operation('Traces.ToggleRecording')
           .params({readOnly: true})
