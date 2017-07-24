@@ -4,7 +4,7 @@ var docUrl;
 
 function pageActionOnNuxeo(tabInfo) {
   var re = /.*\.nuxeo$/;
-  var login = /.+\/login.jsp$/;
+  var login = '/login.jsp';
   var isNuxeo;
   tabUrl = tabInfo.url;
   chrome.cookies.getAll({
@@ -13,7 +13,7 @@ function pageActionOnNuxeo(tabInfo) {
   }, function(cookies) {
     chrome.pageAction.hide(tabInfo.id);
     cookies.forEach(function(cookie) {
-      if ((cookie.value).match(re) && !(tabUrl).match(login)) {
+      if ((cookie.value).match(re) && ((tabUrl).indexOf(login) < 0)) {
         chrome.pageAction.show(tabInfo.id);
         return;
       }
