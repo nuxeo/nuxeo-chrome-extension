@@ -89,7 +89,7 @@ limitations under the License.
 
     function registerLink(element, url) {
       $(element).click(function() {
-				bkg.createTab(url);
+				app.browser.createTabs(url, bkg.studioExt.server.tabId);
       });
     };
 
@@ -124,7 +124,7 @@ limitations under the License.
               _gaq.push(['_trackEvent', 'studio-link-button', 'clicked']);
 
               const studioUrl = `https://connect.nuxeo.com/nuxeo/site/studio/ide?project=${pkgName}`;
-              bkg.createTab(studioUrl);
+              app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
             });
             $('#hot-reload-button').click(function() {
               bkg.bkgHotReload(startLoadingHR, stopLoading);
@@ -161,12 +161,12 @@ limitations under the License.
         registerLink('#nxlayouts-link', 'http://showcase.nuxeo.com/nuxeo/layoutDemo/');
         registerLink('#style-guide-link', 'http://showcase.nuxeo.com/nuxeo/styleGuide/');
 
-        const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        const pathPattern = /^\//;
-        const docPattern = /nxpath\/[A-Za-z_\.0-9-]+(\/[A-Za-z\.0-9_\- \/%~:?#]+)|(?:nxdoc[\/A-Za-z_\.0-9]+)([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})/;
-				const uiDocPattern = /nuxeo\/ui\/#!\/browse(\/[A-Za-z\.0-9_\- \/%~:?#]+)|(?:nuxeo\/ui\/#!\/doc[\/A-Za-z_\.0-9]+)([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})/;
-				const matchGroupDoc = docPattern.exec(bkg.tabUrl);
-				const matchGroupUiDoc = uiDocPattern.exec(bkg.tabUrl);
+        var uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        var pathPattern = /^\//;
+        var docPattern = /nxpath\/[A-Za-z_\.0-9-]+(\/[A-Za-z\.0-9_\- \/%~:?#]+)|(?:nxdoc[\/A-Za-z_\.0-9]+)([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})/;
+				var uiDocPattern = /nuxeo\/ui\/#!\/browse(\/[A-Za-z\.0-9_\- \/%~:?#]+)|(?:nuxeo\/ui\/#!\/doc[\/A-Za-z_\.0-9]+)([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})/;
+				var matchGroupDoc = docPattern.exec(bkg.tabUrl);
+				var matchGroupUiDoc = uiDocPattern.exec(bkg.tabUrl);
 
 				function exportCurrentLink(docPath) {
 					$('#export-current').css('display', 'block');
@@ -250,7 +250,7 @@ limitations under the License.
 							} else {
 								var docURL = nuxeo._baseURL.concat('nxdoc/default/' + event.target.id + '/view_documents');
 							};
-							bkg.createTab(docURL);
+							app.browser.createTabs(docURL, bkg.studioExt.server.tabId);
 						})
 						$('.json-icon').click(function(event) {
 							event.preventDefault();
@@ -280,7 +280,7 @@ limitations under the License.
         var top = (screen.height/2)-(h/2);
         var jsonString = JSON.stringify(jsonObject, undefined, 2);
         bkg._text = escapeHTML(jsonString);
-				bkg.createTab('json.html');
+				app.browser.createTabs('json.html', bkg.studioExt.server.tabId);
       };
 
       function showSearchResults(icon, title, path, uid, vMajor, vMinor) {

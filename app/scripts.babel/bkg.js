@@ -221,7 +221,3 @@ window.reindexDocId = function(input) {
   })
 }
 
-window.createTab = (url) => {
-  app.browser.createTabs(url, studioExt.server.tabId);
-}
-
