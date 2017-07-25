@@ -237,6 +237,7 @@ limitations under the License.
 				})
 				.then(function(res) {
 					if ((res.entries).length > 0) {
+						$('.no-result').css('display', 'none');
 						$('body').css('overflow-y', 'auto');
 						$('#json-search-results').append('<thead><tr><th colspan=20>Search Results:</td></tr></thead><tbody></tbody>');
 						$('table').css('margin-top', '20px');
