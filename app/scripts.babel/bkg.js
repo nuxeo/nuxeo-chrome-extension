@@ -189,9 +189,7 @@ window.reindexNXQL = function(input) {
       baseURL: url
     });
     nuxeo.operation('Elasticsearch.Index')
-      .params({
-        nxql: input
-      })
+      .input(input)
       .execute()
       .then(function() {
         notification('success', 'Success!', 'Your repository index is rebuilding.', '../images/nuxeo-128.png');
