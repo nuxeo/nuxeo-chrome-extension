@@ -1,7 +1,7 @@
 Nuxeo Dev Tools
 ===============
 
-[![Build Status](https://qa.nuxeo.org/jenkins/buildStatus/icon?job=client/browser-developer-extension-master)](https://qa.nuxeo.org/jenkins/view/All/job/Client/job/browser-developer-extension-master/)
+[![Build Status](https://qa.nuxeo.org/jenkins/buildStatus/icon?job=Client/browser-developer-extension-master/master)](https://qa.nuxeo.org/jenkins/job/Client/job/browser-developer-extension-master/job/master/)
 
 # About
 
