@@ -137,6 +137,7 @@ window.bkgHotReload = function(startLoading, stopLoading) {
 };
 
 window.restart = function(startLoadingRS, stopLoading) {
+    disableTabExtension();
     var nuxeo;
     getCurrentTabUrl(function(url) {
       nuxeo = newNuxeo({
@@ -158,7 +159,7 @@ window.restart = function(startLoadingRS, stopLoading) {
           notification('success', 'Success!', 'Nuxeo server is restarting...', '../images/nuxeo-128.png');
           stopLoading();
           setTimeout(function() {
-            chrome.tabs.reload(studioExt.server.tabId);;
+            chrome.tabs.reload(studioExt.server.tabId);
           }, 4000);
         });
     });

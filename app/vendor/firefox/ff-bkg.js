@@ -40,15 +40,29 @@ function pageActionOnNuxeo(tabInfo) {
   });
 }
 
+function disableExt(tabInfo) {
+  disableIcon();
+  chrome.browserAction.disable(tabInfo.id);
+}
+
 function getInfoForTab(tabs) {
   if (tabs.length > 0) {
     chrome.tabs.get(tabs[0].id, pageActionOnNuxeo);
   }
 }
 
+getTabToDisable(tabs) {
+  if (tabs.length > 0) {
+    chrome.tabs.get(tabs[0].id, disableExt);
+}
+
 function onChange(tabInfo) {
   chrome.tabs.query({lastFocusedWindow: true, active: true}, getInfoForTab);
 };
+
+function disableTabExtension() {
+  chrome.tabs.query({lastFocusedWindow: true, active: true}, getTabToDisable);
+}
 
 var target = "<all_urls>";
 chrome.webRequest.onCompleted.addListener(onChange, {urls: [target]});
