@@ -164,7 +164,7 @@ limitations under the License.
         registerLink('#mvel-link', 'https://doc.nuxeo.com/display/NXDOC/Use+of+MVEL+in+Automation+Chains');
         registerLink('#workflow-variables-link', 'https://doc.nuxeo.com/display/NXDOC/Variables+Available+in+the+Automation+Context');
         registerLink('#escalation-rules-link', 'https://doc.nuxeo.com/display/NXDOC/Escalation+Service');
-        registerLink('#nxelements-link', 'https://elements.nuxeo.com/');
+        registerLink('#nxelements-link', 'https://www.webcomponents.org/author/nuxeo');
         registerLink('#nxlayouts-link', 'http://showcase.nuxeo.com/nuxeo/layoutDemo/');
         registerLink('#style-guide-link', 'http://showcase.nuxeo.com/nuxeo/styleGuide/');
 
