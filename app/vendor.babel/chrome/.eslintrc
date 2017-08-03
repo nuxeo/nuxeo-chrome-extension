@@ -34,7 +34,10 @@
   'globals': {
     'app': true,
     '$': true,
+    'getCurrentTabUrl': true,
     'Nuxeo': true,
+    'nuxeo': true,
+    'studioExt': true,
     'disableTabExtension': true,
     'hljs': true,
   }

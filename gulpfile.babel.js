@@ -55,7 +55,7 @@ let buildVersion = function (vendor) {
   return `${major}.${minor}.${buildNumber()}`
 }
 
-let getVersion = buildVersion
+let getVersion = buildVersion;
 
 function readVersion(vendor) {
   let manifest = require(`./app/vendor/${vendor}/manifest.json`);
@@ -95,13 +95,15 @@ function dist(vendor, name) {
   return path.join('dist', vendor || 'base', name || '');
 }
 
-gulp.task('lint', lint('app/scripts.babel/*.js'));
+gulp.task('lint:scripts', lint('app/scripts.babel/**/*.js'));
+gulp.task('lint:vendor', lint('app/vendor.babel/**/*.js'));
 
 gulp.task('extras', () => {
   return gulp.src([
     'app/*.*',
     'app/_locales/**',
     'app/libs/**',
+    '!app/vendor.babel',
     '!app/scripts.babel',
     '!app/*.json',
     '!app/*.html',
@@ -129,19 +131,19 @@ gulp.task('images', () => {
     .pipe(gulp.dest(dist('base', 'images')));
 });
 
-gulp.task('vendor:chrome', () => {
+gulp.task('vendor:chrome', ['babel'], () => {
   return es.merge(
     pipe('app/vendor/chrome/browser.js', dist('chrome', 'scripts'))
   );
 });
 
-gulp.task('vendor:firefox', () => {
+gulp.task('vendor:firefox', ['babel'], () => {
   return es.merge(
     pipe('app/vendor/firefox/browser.js', dist('firefox', 'scripts'))
   );
 });
 
-gulp.task('html', ['babel'], () => {
+gulp.task('html', ['vendor:chrome', 'vendor:firefox'], () => {
   return gulp.src('app/*.html')
     .pipe($.sourcemaps.init())
     .pipe($.if('*.js', $.uglify()))
@@ -169,51 +171,71 @@ gulp.task('release:firefox', ['build:firefox'], (cb) => {
   return runSequence('zip:firefox', cb);
 });
 
-gulp.task('babel', () => {
-  return gulp.src('app/scripts.babel/**/*.js')
+gulp.task('babel', ['lint:vendor', 'lint:scripts'], (cb) => {
+  return runSequence('babel:base', 'babel:vendor', cb);
+});
+
+gulp.task('babel:base', () => {
+  return gulp.src('app/scripts.babel/*.js')
     .pipe($.babel({
       presets: ['es2015']
     }))
     .pipe(gulp.dest('app/scripts'));
 });
 
-gulp.task('clean', () => {
-  return del.sync(['.tmp', 'dist', 'package', 'app/scripts']);
+gulp.task('babel:vendor', ['babel:vendor:chrome', 'babel:vendor:firefox', 'manifest']);
+
+gulp.task('babel:vendor:firefox', () => {
+  return gulp.src('app/vendor.babel/firefox/*.js')
+    .pipe($.babel({
+      presets: ['es2015']
+    })).pipe(gulp.dest('app/vendor/firefox'));
 });
 
-gulp.task('watch', ['lint', 'babel', 'html', 'vendor:chrome', 'vendor:firefox', 'extras'], () => {
+gulp.task('babel:vendor:chrome', () => {
+  return gulp.src('app/vendor.babel/chrome/*.js')
+    .pipe($.babel({
+      presets: ['es2015']
+    })).pipe(gulp.dest('app/vendor/chrome'));
+});
+
+gulp.task('manifest', ['manifest:firefox', 'manifest:chrome']);
+
+gulp.task('manifest:firefox', () => {
+  return gulp.src('app/vendor.babel/firefox/manifest.json')
+    .pipe(gulp.dest('app/vendor/firefox'));
+});
+
+gulp.task('manifest:chrome', () => {
+  return gulp.src('app/vendor.babel/chrome/manifest.json')
+    .pipe(gulp.dest('app/vendor/chrome'))
+});
+
+gulp.task('clean', () => {
+  return del.sync(['.tmp', 'dist', 'package', 'app/scripts', 'app/vendor']);
+});
+
+gulp.task('watch', ['build'], () => {
   $.livereload.listen();
 
-  gulp.src('app/vendor/chrome/manifest.json')
-    .pipe($.chromeManifest({
-      background: {
-        target: 'scripts/background.js'
-      }
-    }))
-    .pipe(gulp.dest(dist('chrome')));
-
-  gulp.src('app/vendor/firefox/manifest.json')
-    .pipe($.chromeManifest({
-      background: {
-        target: 'scripts/background.js'
-      }
-    }))
-    .pipe(gulp.dest(dist('firefox')));
-
+  gulp.watch('app/scripts.babel/*.js', ['html']);
+  gulp.watch('app/vendor.babel/**/*.js', ['vendor:chrome', 'vendor:firefox']);
   gulp.watch([
     'app/*.html',
-    'app/scripts/**/*.js',
     'app/libs/**/*.js',
     'app/images/**/*',
     'app/styles/**/*',
-    'app/_locales/**/*.json',
+    'app/_locales/**/*.json'
+  ]).on('change', function () {
+    gulp.start('base');
+    $.livereload.reload;
+  });
+  gulp.watch([
+    'app/scripts/**/*.js',
     'app/vendor/**/*'
-  ]).on('change', function() {
-		gulp.start('build');
-		$.livereload.reload;
-	});
-
-  gulp.watch('app/scripts.babel/**/*.js', ['lint', 'babel']);
+  ]).on('change', function () {
+    $.livereload.reload;
+  });
   gulp.watch('bower.json', ['wiredep']);
 });
 
@@ -256,9 +278,15 @@ gulp.task('package:firefox', (done) => {
   return runSequence('build:firefox', 'zip:firefox', done);
 });
 
-gulp.task('build:base', ['lint', 'babel', 'html', 'images', 'extras']);
+gulp.task('base', () => {
+  gulp.src(dist('base', '**/*'))
+    .pipe(gulp.dest(dist('firefox')))
+    .pipe(gulp.dest(dist('chrome')));
+});
 
-gulp.task('build:chrome', ['build:base', 'vendor:chrome'], (done) => {
+gulp.task('build:base', ['images', 'extras', 'html']);
+
+gulp.task('build:chrome', ['build:base'], (done) => {
   gulp.src(dist('base', '**/*'))
     .pipe(gulp.dest(dist('chrome')));
 
