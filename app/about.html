@@ -17,60 +17,54 @@
     limitations under the License.
     -->
     <meta charset="utf-8">
-    <title>About Nuxeo Dev Tools</title>
-    <!-- build:css styles/popup-vendor.css -->
-    <!-- bower:css -->
-    <!-- endbower -->
-    <!-- endbuild -->
+    <title>About - Nuxeo Dev Tools</title>
+
     <!-- build:css styles/main.css -->
     <link href="styles/main.css" rel="stylesheet">
     <!-- endbuild -->
+    <!-- build:js scripts/about-vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+    <script src="scripts/browser.js"></script>
+    <!-- build:js scripts/about.js -->
+    <script src="scripts/about.js"></script>
+    <!-- endbuild -->
   </head>
-<body>
-  <div class="nav-link">
-    <a href="popup.html">Back</a>
-  </div>
-  <div class="nxcontainer">
-    <div class="heading">
+  <body>
+    <div class="nav-link">
+      <a href="popup.html">Back</a>
+    </div>
+    <div class="nxcontainer">
+      <div class="heading">
+        <div class="nxrow">
+          <div class="logo">
+          </div>
+          <div class="server-main">
+            <ul>
+              <li class="title">Nuxeo Dev Tools</li>
+              <li class="description">Manage your Nuxeo servers</li>
+            </ul>
+          </div>
+        </div>
+      </div>
       <div class="nxrow">
-        <div class="logo">
+        <div id="version" class="version"></div>
+      </div>
+      <div class="nxrow">
+        <div id="copyright"></div>
+      </div>
+      <div class ="nxrow">
+        <div class="license">
+          Nuxeo Extension is released under the <a id="apache" href="#">Apache License Version 2.0</a>.
         </div>
-        <div class="server-main">
-          <ul>
-            <li class="title">Nuxeo Dev Tools</li>
-            <li class="description">Manage your Nuxeo servers</li>
-          </ul>
+      </div>
+      <div class="nxrow">
+        <div class="feedback">
+          <a class="button main-page" id="feedback"><span>Give us feedback</span></a>
         </div>
       </div>
     </div>
-    <div class="nxrow">
-      <div id="version" class="version"></div>
-    </div>
-    <div class="nxrow">
-      <div id="copyright"></div>
-    </div>
-    <div class ="nxrow">
-      <div class="license">
-        Nuxeo Extension is released under the <a id="apache" href="#">Apache License Version 2.0</a>.
-      </div>
-    </div>
-    <div class="nxrow">
-      <div class="feedback">
-        <a class="button main-page" id="feedback"><span>Give us feedback</span></a>
-      </div>
-    </div>
-  </div>
-<!-- build:js scripts/about-vendor.js -->
-<!-- bower:js -->
-<script src="bower_components/jquery/dist/jquery.js"></script>
-<!-- endbower -->
-<!-- endbuild -->
-
-<script src="scripts/browser.js"></script>
-<!-- build:js scripts/about.js -->
-<script src="scripts/about.js"></script>
-<!-- endbuild -->
-<div>
-</div>
-</body>
+  </body>
 </html>

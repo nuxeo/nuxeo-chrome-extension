@@ -18,6 +18,7 @@ import debug from 'gulp-debug';
 import eslint from 'gulp-eslint';
 
 const $ = gulpLoadPlugins();
+let version = '';
 
 function pipe(src, transforms, dest) {
   if (typeof transforms === 'string') {
@@ -95,6 +96,10 @@ function lint(files) {
 
 function dist(vendor, name) {
   return path.join('dist', vendor || 'base', name || '');
+}
+
+function prependScript(node, file) {
+  node.prepend(`<script src="${file}"></script>`);
 }
 
 gulp.task('lint', lint([
@@ -294,7 +299,7 @@ gulp.task('build:chrome', ['build:base'], (done) => {
   gulp.src(dist('base', '**/*'))
     .pipe(gulp.dest(dist('chrome')));
 
-  let version = getVersion('chrome');
+  version = getVersion('chrome');
   util.log(`Building Chrome Extension: ${version}`);
 
   gulp.src('app/vendor/chrome/manifest.json')
@@ -314,6 +319,7 @@ gulp.task('build:sinon-chrome', ['build:chrome'], () => {
   // Copy Chrome build
   gulp.src(dist('chrome', '**/*'))
     .pipe(filter(['**', '!**/popup.html']))
+    .pipe(filter(['**', '!**/about.html']))
     .pipe(gulp.dest(dist(target)));
 
   // Add sinon-chrome.min script
@@ -331,15 +337,24 @@ gulp.task('build:sinon-chrome', ['build:chrome'], () => {
   // Create a standalone index.html with background.js, sinon-chrome and a script injecter to manipulate mocks from Webdriverio.
   gulp.src(dist('chrome', 'popup.html'))
     .pipe(cheerio(($) => {
-      function prependScript(node, file) {
-        node.prepend(`<script src="${file}"></script>`);
-      }
-
       const $head = $('head');
-      // !! Order matter; as we use `prepend`, last added will be first.
+      // !! Order matters; as we use `prepend`, last added will be first.
       prependScript($head, 'scripts/background.js');
       prependScript($head, 'scripts/injecter.js')
       prependScript($head, 'scripts/sinon-chrome.min.js');
+    }))
+    .pipe(gulp.dest(dist(target)));
+
+  gulp.src(dist('chrome', 'about.html'))
+    .pipe(cheerio(($) => {
+      const $head = $('head');
+      // !! Order matters; as we use `prepend`, last added will be first.
+      prependScript($head, 'scripts/background.js');
+      prependScript($head, 'scripts/injecter.js')
+      prependScript($head, 'scripts/sinon-chrome.min.js');
+      const date = new Date().getFullYear();
+      $('#copyright').html(`&#169; ${date} Nuxeo`);
+      $('#version').html(version);
     }))
     .pipe(gulp.dest(dist(target)));
 });
@@ -348,7 +363,7 @@ gulp.task('build:firefox', ['build:base', 'vendor:firefox'], (done) => {
   gulp.src(dist('base', '**/*'))
     .pipe(gulp.dest(dist('firefox')));
 
-  let version = getVersion('firefox');
+  version = getVersion('firefox');
   util.log(`Building Firefox Extension: ${version}`);
 
   gulp.src('app/vendor/firefox/manifest.json')
