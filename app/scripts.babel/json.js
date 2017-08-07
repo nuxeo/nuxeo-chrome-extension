@@ -14,7 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-chrome.runtime.getBackgroundPage((bkg) => {
-	document.getElementById('json-string').innerHTML = bkg._text;
-	hljs.initHighlighting();
+$(() => {
+  chrome.runtime.getBackgroundPage((bkg) => {
+    document.getElementById('json-string').innerHTML = bkg._text;
+    hljs.initHighlighting();
+  });
 });

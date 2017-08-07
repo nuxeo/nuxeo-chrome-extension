@@ -11,6 +11,10 @@ module.exports = function () {
     expect(browser.getTitle()).to.equal('Nuxeo Dev Tools');
   });
 
+  this.Given('Injected mocks', (javascript) => {
+    browser.execute(javascript);
+  });
+
   this.When('I enter $text in $selector input', (text, selector) => {
     browser.$(`#${selector}`).addValue(text);
     // Wait until debouncing is ok
@@ -43,10 +47,34 @@ module.exports = function () {
     expect(trPath.$('.doc-path').getText()).to.equal(parentPath);
   });
 
-  this.When('I click on the $link link', (link) => {
+  this.When(/^I click on the( internal)? (.+) link/, (internal, link) => {
     link = link.toLowerCase();
+
     browser.waitForVisible(`#${link}`);
     browser.$(`#${link}`).click();
+
+    if (internal) {
+      // Page changed, need to refresh background context
+      expect(browser.execute(() => {
+        getCurrentTabUrl(function() {});
+        return window.studioExt.server.url;
+      }).value).to.be.equal('http://localhost:8080/nuxeo/');
+    } else {
+      // Otherwise, check that tabs.create has been called
+      expect(browser.execute(() => {
+        return chrome.tabs.create.called;
+      }).value).to.be.true;
+    }
+  });
+
+  this.Then('current url is $url with title $title', (url, title) => {
+    const tabIds = browser.getTabIds();
+    expect(tabIds).to.have.lengthOf(2);
+
+    browser.switchTab(tabIds[1]);
+    expect(browser.getUrl()).to.be.eq(url);
+    expect(browser.getTitle()).to.be.eq(title);
+    browser.close();
   });
 
   this.Then('I am taken to the $popup popup', (popup) => {

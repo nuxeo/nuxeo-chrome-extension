@@ -68,7 +68,8 @@
     "build": "gulp build",
     "qa": "gulp clean build:sinon-chrome package && chimp test/chimp-ci.conf.js",
     "pretest": "gulp clean build:sinon-chrome",
-    "test": "chimp test/chimp.conf.js"
+    "test": "chimp test/chimp.conf.js",
+    "watch": "chimp test/chimp.conf.js --watch"
   },
   "dependencies": {
     "nuxeo": "3.2.1"
