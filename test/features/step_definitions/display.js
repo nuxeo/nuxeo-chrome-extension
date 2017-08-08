@@ -1,18 +1,33 @@
 module.exports = function () {
-  this.Given(/^the extension is open(?: as ([Ff]irefox|[Cc]hrome))?/, (arg) => {
+
+  function injectMocks() {
+    return browser.execute(() => {
+      chrome.tabs.create.callsFake((opts) => {
+        //window.document.location = opts.url;
+        window.open(opts.url);
+      });
+    });
+  }
+
+  this.Given(/^the (.+) page is open(?: on ([Ff]irefox|[Cc]hrome))?/, (page, arg) => {
     // Object.keys(global).forEach(k => console.log(k));
     const dist = arg || 'sinon-chrome';
 
     // Open Popup in the current Window
-    const url = `file://${__dirname}/../../../dist/${dist.toLowerCase()}/popup.html`
+    const url = `file://${__dirname}/../../../dist/${dist.toLowerCase()}/${page.toLowerCase()}.html`
     browser.url(url);
 
     // http://chaijs.com/api/bdd/
-    expect(browser.getTitle()).to.equal('Nuxeo Dev Tools');
-  });
-
-  this.Given('Injected mocks', (javascript) => {
-    browser.execute(javascript);
+    if (page === 'Popup') {
+      expect(browser.getTitle()).to.equal('Nuxeo Dev Tools');
+    } else {
+      expect(browser.execute(() => {
+        getCurrentTabUrl(function() {});
+        return window.studioExt.server.url;
+      }).value).to.be.equal('http://localhost:8080/nuxeo/');
+      expect(browser.getTitle()).to.equal(`${page} - Nuxeo Dev Tools`);
+      injectMocks();
+    }
   });
 
   this.When('I enter $text in $selector input', (text, selector) => {
@@ -49,7 +64,6 @@ module.exports = function () {
 
   this.When(/^I click on the( internal)? (.+) link/, (internal, link) => {
     link = link.toLowerCase();
-
     browser.waitForVisible(`#${link}`);
     browser.$(`#${link}`).click();
 
@@ -59,6 +73,7 @@ module.exports = function () {
         getCurrentTabUrl(function() {});
         return window.studioExt.server.url;
       }).value).to.be.equal('http://localhost:8080/nuxeo/');
+      injectMocks();
     } else {
       // Otherwise, check that tabs.create has been called
       expect(browser.execute(() => {
@@ -67,18 +82,20 @@ module.exports = function () {
     }
   });
 
-  this.Then('current url is $url with title $title', (url, title) => {
+  this.Then('the $title page opens', (title) => {
     const tabIds = browser.getTabIds();
     expect(tabIds).to.have.lengthOf(2);
-
     browser.switchTab(tabIds[1]);
-    expect(browser.getUrl()).to.be.eq(url);
     expect(browser.getTitle()).to.be.eq(title);
     browser.close();
   });
 
-  this.Then('I am taken to the $popup popup', (popup) => {
-    expect(browser.getTitle()).to.equal(`${popup} - Nuxeo Dev Tools`);
+  this.Then(/I am taken to the (.+ )?popup/, (popup) => {
+    let title = '';
+    if (popup) {
+      title = `${popup}- `;
+    }
+    expect(browser.getTitle()).to.equal(`${title}Nuxeo Dev Tools`);
   });
 
   this.Then('I can see the version number', () => {
