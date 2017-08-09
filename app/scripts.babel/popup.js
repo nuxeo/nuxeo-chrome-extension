@@ -135,9 +135,9 @@ limitations under the License.
           const pkgName = JSON.parse(text).studio;
           if (pkgName) {
             $('#message').css('display', 'none');
-            $('#studio-link-button, #hot-reload-button').css('display', 'flex');
-            $('#studio-link-button').click(() => {
-              _gaq.push(['_trackEvent', 'studio-link-button', 'clicked']);
+            $('#studio-button, #hot-reload-button').css('display', 'flex');
+            $('#studio-button').click(() => {
+              _gaq.push(['_trackEvent', 'studio-button', 'clicked']);
 
               const studioUrl = `https://connect.nuxeo.com/nuxeo/site/studio/ide?project=${pkgName}`;
               app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
@@ -146,13 +146,13 @@ limitations under the License.
               bkg.bkgHotReload(startLoadingHR, stopLoading);
             });
           } else {
-            $('#studio-link-button, #hot-reload-button').css('display', 'none');
+            $('#studio-button, #hot-reload-button').css('display', 'none');
             $('#message').css('display', 'none');
             $('#nopkg').css('display', 'block');
             setTimeout(() => {
               $('#nopkg').fadeOut('fast');
             }, 2000);
-            $('#studio-link-button, #hot-reload-button').click(() => {
+            $('#studio-button, #hot-reload-button').click(() => {
               bkg.notification('no_studio_project',
                 'No associated Studio project',
                 'If you\'d like to use this function, please associate your Nuxeo server with a studio project',

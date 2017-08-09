@@ -268,7 +268,7 @@ a.button:active {
 }
 
 #hot-reload-button,
-#studio-link-button {
+#studio-button {
   display: none;
 }
 

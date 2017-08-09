@@ -49,6 +49,12 @@ module.exports = function () {
     expect(browser.$('.server-name-url').getText()).to.equal(url);
   });
 
+  this.Then('I can see the $button button', (button) => {
+    let selector = button.replace(/\s+/g, '-').toLowerCase();
+    selector = `${selector}-button`;
+    browser.waitForVisible(`#${selector}`).should.be.true;
+  });
+
   this.Then(/the server responds with (\d+) documents?/, (size) => {
     expect(browser.$('#search-results').$$('.search-result').length).to.equal(Number.parseInt(size));
   });

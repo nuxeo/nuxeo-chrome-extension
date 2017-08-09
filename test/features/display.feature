@@ -4,8 +4,11 @@ Feature: Popup Display
 
   Scenario: Popup.html Display
     Given the Popup page is open
+    # And I have a valid Studio project
     Then I can see http://localhost:8080/nuxeo/ as the connected server
-    # Test Hot Reload and Studio buttons here
+    And I can see the Hot Reload button
+    And I can see the Studio button
+    # Test Hot Reload and Studio buttons
 
   Scenario: About.html Display
     Given the Popup page is open
