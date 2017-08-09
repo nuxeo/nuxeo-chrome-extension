@@ -105,6 +105,8 @@ function prependScript(node, file) {
 gulp.task('lint', lint([
   'app/scripts.babel/*.js',
   'app/vendor.babel/**/*.js',
+  'test/features/step_definitions/*.js',
+  'test/features/step_definitions/support/**/*.js',
 ]));
 
 gulp.task('extras', () => {

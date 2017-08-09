@@ -1,9 +1,8 @@
 module.exports = function () {
-
   function injectMocks() {
     return browser.execute(() => {
       chrome.tabs.create.callsFake((opts) => {
-        //window.document.location = opts.url;
+        // window.document.location = opts.url;
         window.open(opts.url);
       });
     });
@@ -14,7 +13,7 @@ module.exports = function () {
     const dist = arg || 'sinon-chrome';
 
     // Open Popup in the current Window
-    const url = `file://${__dirname}/../../../dist/${dist.toLowerCase()}/${page.toLowerCase()}.html`
+    const url = `file://${__dirname}/../../../dist/${dist.toLowerCase()}/${page.toLowerCase()}.html`;
     browser.url(url);
 
     // http://chaijs.com/api/bdd/
@@ -22,7 +21,7 @@ module.exports = function () {
       expect(browser.getTitle()).to.equal('Nuxeo Dev Tools');
     } else {
       expect(browser.execute(() => {
-        getCurrentTabUrl(function() {});
+        getCurrentTabUrl(() => {});
         return window.studioExt.server.url;
       }).value).to.be.equal('http://localhost:8080/nuxeo/');
       expect(browser.getTitle()).to.equal(`${page} - Nuxeo Dev Tools`);
@@ -76,15 +75,13 @@ module.exports = function () {
     if (internal) {
       // Page changed, need to refresh background context
       expect(browser.execute(() => {
-        getCurrentTabUrl(function() {});
+        getCurrentTabUrl(() => {});
         return window.studioExt.server.url;
       }).value).to.be.equal('http://localhost:8080/nuxeo/');
       injectMocks();
     } else {
       // Otherwise, check that tabs.create has been called
-      expect(browser.execute(() => {
-        return chrome.tabs.create.called;
-      }).value).to.be.true;
+      expect(browser.execute(() => chrome.tabs.create.called).value).to.be.true;
     }
   });
 
@@ -114,5 +111,4 @@ module.exports = function () {
     browser.waitForVisible('#copyright');
     expect(browser.$('#copyright').getText()).to.include(date);
   });
-
-}
+};

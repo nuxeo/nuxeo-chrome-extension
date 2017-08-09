@@ -6,8 +6,8 @@ global.users = {
 
 module.exports = function () {
   this.After(() => {
-    const userWorkspaces = `/default-domain/UserWorkspaces/`;
+    const userWorkspaces = '/default-domain/UserWorkspaces/';
     return nuxeo.repository().delete(userWorkspaces)
-                   .catch(() => {}); // eslint-disable-line arrow-body-style
+      .catch(() => {}); // eslint-disable-line arrow-body-style
   });
 };
