@@ -1,3 +1,5 @@
+import nuxeo from './support/services/client';
+
 module.exports = function () {
   function injectMocks() {
     return browser.execute(() => {
@@ -129,5 +131,108 @@ module.exports = function () {
   this.Then('I am connected to API Playground on $server', (server) => {
     browser.waitForVisible('::shadow div.connection a');
     expect(browser.$('::shadow div.connection a').getText()).to.equal(server);
+  });
+
+  this.Then('I see the confirmation dialog', () => {
+    browser.waitForVisible('div.confirmation-modal');
+  });
+
+  this.When('I confirm the dialog', () => {
+    browser.$('button.confirm').click();
+  });
+
+  this.Then('the server restarts', () => {
+    let connected = true;
+    while (connected) {
+      browser.pause(500);
+      nuxeo.connect()
+        .then(client => {
+          connected = client.connected;
+        })
+        .catch(() => {
+          connected = false;
+        });
+    }
+    while (!connected) {
+      browser.pause(500);
+      nuxeo.connect()
+        .then(client => {
+          connected = client.connected;
+        })
+        .catch(() => {
+          connected = false;
+        })
+        .done();
+    }
+  });
+
+  this.Then('I can log back into Nuxeo', () => {
+    browser.timeouts('implicit', 30000);
+    const tabIds = browser.getTabIds();
+    browser.switchTab(tabIds[1]);
+    browser.pause(10000);
+    browser.refresh();
+    browser.$('#username').waitForVisible();
+    browser.$('#username').addValue('Administrator');
+    browser.$('#password').addValue('Administrator');
+    browser.$('input.login_button').click();
+    browser.switchTab(tabIds[0]);
+    browser.refresh();
+  });
+
+  this.Then(/^traces are (enabled|disabled)/, (mode) => {
+    const enabled = browser.$('#automation-call-tracing-toggle').getAttribute('checked');
+    if (mode === 'enabled') {
+      if (enabled === null) {
+        toggleTraces('Popup');
+      }
+      tracesEnabled('Popup').should.be.true;
+    } else {
+      if (enabled === 'true') {
+        toggleTraces('Popup');
+      }
+      tracesEnabled('Popup').should.be.false;
+    }
+  });
+
+  this.Then(/^I can see that traces are (enabled|disabled) on the (Automation Documentation|Popup) page/, (mode, page) => {
+    if (page === 'Nuxeo Dev Tools') {
+      if (mode === 'enabled') {
+        tracesEnabled(page).should.be.true;
+      } else {
+        tracesEnabled('Popup').should.be.false;
+      }
+    } else if (mode === 'enabled') {
+      browser.$('//a[text()="Disable"]').waitForVisible;
+    } else {
+      browser.$('//a[text()="Enable"]').waitForVisible;
+    }
+  });
+
+  this.Then('I click on the $operation operation', (operation) => {
+    const tabIds = browser.getTabIds();
+    browser.switchTab(tabIds[2]);
+    browser.$(`//a[text()="${operation}"]`).waitForVisible;
+    browser.$(`//a[text()="${operation}"]`).click();
+  });
+
+  this.When(/^I (enable|diasable) traces from the (Automation Documentation|Popup) page$/, (action, page) => {
+    if ((tracesEnabled(page) && action === 'disable') || (!tracesEnabled(page) && action === 'enable')) {
+      toggleTraces(page);
+    }
+  });
+
+  this.When(/^I go to the (.+) page$/, (page) => {
+    const tabIds = browser.getTabIds();
+    if (page === 'Popup') {
+      page = 'Nuxeo Dev Tools';
+    }
+    for (let i = 0; i < tabIds.length; i += 1) {
+      if (page !== browser.getTitle()) {
+        browser.switchTab(tabIds[i]);
+      } else {
+        return;
+      }
+    }
   });
 };
