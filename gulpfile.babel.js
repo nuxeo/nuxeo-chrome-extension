@@ -86,12 +86,19 @@ function updateVersionForRelease(vendor, distFile) {
 }
 
 function lint(files) {
-  return () => {
-    return gulp.src(files)
-      .pipe(eslint())
-      .pipe(eslint.format())
-      .pipe(eslint.format('checkstyle', fs.createWriteStream('ftest/target/checkstyle-result.xml')));
-  };
+  try {
+    fs.mkdirSync('ftest/target');
+    fs.writeFileSync('ftest/target/checkstyle-result.xml');
+  }
+  catch(err) {}
+  finally {
+    return () => {
+      return gulp.src(files)
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.format('checkstyle', fs.createWriteStream('ftest/target/checkstyle-result.xml')));
+    };
+  }
 }
 
 function dist(vendor, name) {
