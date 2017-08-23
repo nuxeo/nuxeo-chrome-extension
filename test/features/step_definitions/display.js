@@ -10,6 +10,33 @@ module.exports = function () {
     });
   }
 
+  function toggleTraces(page) {
+    if (page === 'Popup') {
+      browser.$('label.onoffswitch-label').waitForVisible();
+      browser.$('label.onoffswitch-label').click();
+    } else {
+      browser.$('//a[@href="/nuxeo/site/automation/doc/toggleTraces"]').waitForVisible();
+      browser.$('//a[@href="/nuxeo/site/automation/doc/toggleTraces"]').click();
+    }
+  }
+
+  function tracesEnabled(page) {
+    if (page === 'Popup') {
+      const enabled = browser.$('#automation-call-tracing-toggle').getAttribute('checked');
+      if (enabled === 'true') {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (browser.isExisting('//a[text()="Disable"]')) {
+      return true;
+    } else if (browser.isExisting('//a[text()="Enable"]')) {
+      return false;
+    } else {
+      return undefined;
+    }
+  }
+
   this.Given(/^the (.+) page is open(?: on ([Ff]irefox|[Cc]hrome))?/, (page, arg) => {
     // Object.keys(global).forEach(k => console.log(k));
     const dist = arg || 'sinon-chrome';
@@ -109,12 +136,17 @@ module.exports = function () {
     browser.waitUntil(() => browser.getTitle() === title);
   });
 
-  this.Then(/I am taken to the (.+ )?popup/, (popup) => {
-    let title = '';
-    if (popup) {
-      title = `${popup}- `;
+  this.Then(/I am taken to the (.+ )?(popup|page)/, (title, page) => {
+    if (page === 'popup') {
+      if (title) {
+        title = `${title}- `;
+      } else {
+        title = '';
+      }
+      expect(browser.getTitle()).to.equal(`${title}Nuxeo Dev Tools`);
+    } else {
+      browser.waitUntil(() => browser.getTitle() === title.trim());
     }
-    expect(browser.getTitle()).to.equal(`${title}Nuxeo Dev Tools`);
   });
 
   this.Then('I see the version number', () => {
@@ -144,20 +176,21 @@ module.exports = function () {
   this.Then('the server restarts', () => {
     let connected = true;
     while (connected) {
-      browser.pause(500);
+      browser.pause(10000);
       nuxeo.connect()
-        .then(client => {
-          connected = client.connected;
+        .then(async (client) => {
+          connected = await client.connected;
         })
         .catch(() => {
           connected = false;
-        });
+        })
+        .done();
     }
     while (!connected) {
-      browser.pause(500);
+      browser.pause(10000);
       nuxeo.connect()
-        .then(client => {
-          connected = client.connected;
+        .then(async (client) => {
+          connected = await client.connected;
         })
         .catch(() => {
           connected = false;
@@ -234,5 +267,6 @@ module.exports = function () {
         return;
       }
     }
+    expect(browser.getTitle()).to.equal(page);
   });
 };

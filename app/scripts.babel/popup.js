@@ -40,7 +40,7 @@ limitations under the License.
 
   document.addEventListener('DOMContentLoaded', () => {
     const buttons = document.querySelectorAll('a');
-    const debug = document.getElementById('debug-switch');
+    const debug = document.getElementById('automation-call-tracing-toggle');
     const exportCurrent = document.getElementById('export-current');
     const jsonSearch = document.getElementById('search');
     for (let i = 0; i < buttons.length; i += 1) {
@@ -167,7 +167,7 @@ limitations under the License.
           .params({ readOnly: true })
           .execute()
           .then((response) => {
-            $('#debug-switch').attr('checked', response.value);
+            $('#automation-call-tracing-toggle').attr('checked', response.value);
           });
 
         const serverString = escapeHTML(nuxeo._baseURL);
@@ -332,12 +332,12 @@ limitations under the License.
         }
       });
 
-      $('#debug-switch').click(() => {
+      $('#automation-call-tracing-toggle').click(() => {
         nuxeo.operation('Traces.ToggleRecording')
           .params({ readOnly: false })
           .execute()
           .then((response) => {
-            $('#debug-switch').attr('checked', response.value);
+            $('#automation-call-tracing-toggle').attr('checked', response.value);
           });
       });
 
