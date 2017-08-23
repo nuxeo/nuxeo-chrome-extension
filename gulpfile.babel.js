@@ -399,6 +399,6 @@ gulp.task('build:firefox', ['build:base', 'vendor:firefox'], (done) => {
 });
 
 gulp.task('default', ['clean', 'build']);
-gulp.task('build', ['build:chrome', 'build:firefox']);
+gulp.task('build', ['build:chrome', 'build:firefox', 'build:sinon-chrome']);
 gulp.task('package', ['package:chrome', 'package:firefox']);
 gulp.task('release', ['release:chrome', 'release:firefox']);
