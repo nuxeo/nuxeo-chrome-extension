@@ -9,3 +9,4 @@ app/scripts
 app/vendor
 npm-debug.log
 target
+ftest/src/test/resources/instance.clid

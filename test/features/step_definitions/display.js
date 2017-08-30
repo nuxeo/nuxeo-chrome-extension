@@ -112,6 +112,13 @@ module.exports = function () {
       }
     }
     expect(browser.getTitle()).to.equal(page);
+    if (page === 'Nuxeo Dev Tools') {
+      expect(browser.execute(() => {
+        getCurrentTabUrl(() => {});
+        return window.studioExt.server.url;
+      }).value).to.be.equal('http://localhost:8080/nuxeo/');
+      injectMocks();
+    }
     browser.refresh();
   });
 };

@@ -1,5 +1,5 @@
 Feature: Automation Tracing
-@watch
+
   Scenario: Automation Call Tracing toggle
     Given the Popup page is open
     And traces are disabled from the Popup page
