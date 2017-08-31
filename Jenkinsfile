@@ -47,6 +47,7 @@ node(env.SLAVE) {
                     def jdk = tool name: 'java-8-oracle'
                     env.JAVA_HOME = "${jdk}"
                     def mvnHome = tool name: 'maven-3.3', type: 'hudson.tasks.Maven$MavenInstallation'
+                    sh "set +x; echo ${env.CLID}  | sed 's/--/\\n/' >${env.RESOURCES_PATH}/instance.clid"
                     sh "${mvnHome}/bin/mvn clean verify -f ${env.POM_PATH}"
                 }
 
