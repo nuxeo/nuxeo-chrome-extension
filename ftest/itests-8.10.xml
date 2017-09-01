@@ -1,4 +1,4 @@
-<project name="nuxeo-js-client-tests-8.10" xmlns:nx="urn:nuxeo-build" xmlns:artifact="urn:nuxeo-artifact">
+<project name="nuxeo-bde-tests-8.10" xmlns:nx="urn:nuxeo-build" xmlns:artifact="urn:nuxeo-artifact">
   <taskdef resource="org/nuxeo/build/antlib.xml" uri="urn:nuxeo-build" />
   <taskdef resource="org/nuxeo/build/artifact/antlib.xml" uri="urn:nuxeo-artifact" />
   <taskdef resource="net/sf/antcontrib/antlib.xml" />
@@ -16,7 +16,7 @@
       <param name="value" value="true" />
     </antcall>
     <copy file="src/test/resources/cors-config.xml" todir="${nuxeo.nxserver}/config/" />
-    <!-- <copy file="src/test/resources/instance.clid" todir="${nuxeo.nxserver}/data/" /> -->
+    <copy file="src/test/resources/instance.clid" todir="${nuxeo.nxserver}/data/" />
     <copy tofile="${out.dir}/nuxeo-marketplace-jsf-ui.zip">
       <artifact:file key="org.nuxeo.ecm.distribution:nuxeo-marketplace-jsf-ui::zip" />
     </copy>
