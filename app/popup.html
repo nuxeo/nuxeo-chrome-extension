@@ -112,33 +112,47 @@
       </div>
 
       <div class="buttons">
-        <div class="nxrow">
-          <div id="message">
-            Searching for Studio Package...
+        <div id="no-studio-buttons">
+          <div class="nxrow">
+            <div id="message">
+              Searching for Studio Package...
+            </div>
+            <div id="nopkg">
+              No Studio package found!
+            </div>
           </div>
-          <div id="nopkg">
-            No Studio package found!
+        </div>
+        <div id="studio-buttons">
+          <div class="nxrow">
+            <div class="hot-reload">
+              <a class="button main-page" id="hot-reload-button">Hot Reload</a>
+            </div>
           </div>
-          <div class="hot-reload">
-            <a class="button main-page" id="hot-reload-button" href="#"><span>Hot Reload</span></a>
+          <div class="nxrow">
+            <div class="designer-livepreview">
+              <a class="button main-page" id="designer-livepreview-button">Designer Live Preview</a> 
+            </div>
+          </div>
+          <div class="nxrow" id="designer-livepreview-message">
+            <a id="designer-livepreview-login" target="_blank">Click to login to connect so you can use the designer live preview</a>
           </div>
         </div>
 
         <div class="nxrow">
           <div class="reindex-es">
-            <a class="button main-page" id="reindex-es-button" href="es-reindex.html"><span>Reindex Elasticsearch</span></a>
+            <a class="button main-page" id="reindex-es-button" href="es-reindex.html">Reindex Elasticsearch</a>
           </div>
         </div>
 
         <div class="nxrow">
           <div class="restart">
-            <a class="button main-page" id="restart-button"><span>Restart Server</span></a>
+            <a class="button main-page" id="restart-button">Restart Server</a>
           </div>
         </div>
 
         <div class="nxrow">
           <div class="traces">
-            <a class="button main-page" id="traces-button"><span>Automation Call Tracing</span></a>
+            <a class="button main-page" id="traces-button">Automation Call Tracing</a>
           </div>
         </div>
 

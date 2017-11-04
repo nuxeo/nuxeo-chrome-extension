@@ -65,6 +65,7 @@
     "chai": "^4.1.2",
     "cucumber": "^4.1.0",
     "nuxeo": "3.11.0",
-    "sinon-chrome": "^2.3.2"
+    "sinon-chrome": "^2.3.2",
+    "webextension-polyfill": "0.4.0"
   }
 }

@@ -21,7 +21,8 @@ const studioExt = window.studioExt = window.studioExt || {};
 
 let dependencies;
 
-const notification = window.notification = (idP, titleP, messageP, img, interaction) => {
+const notification = window.notification = (idP, titleP, messageP, img, interaction, clickHandler) => {
+  const click = clickHandler;
   try {
     chrome.notifications.create(idP, {
       type: 'basic',
@@ -32,6 +33,7 @@ const notification = window.notification = (idP, titleP, messageP, img, interact
     }, () => {
       console.log(chrome.runtime.lastError);
     });
+
   } catch (err) {
     chrome.notifications.create(idP, {
       type: 'basic',
@@ -40,6 +42,15 @@ const notification = window.notification = (idP, titleP, messageP, img, interact
       iconUrl: img,
     }, () => {
       console.log(chrome.runtime.lastError);
+    });
+  }
+  if (clickHandler) {
+    browser.notifications.onClicked.addListener((notificationId) => {
+      console.log('notification clicked ' + notificationId);
+      if (notificationId === idP) {
+        console.log('executing handler');
+        click();
+      }
     });
   }
 };

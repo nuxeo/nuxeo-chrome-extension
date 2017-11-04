@@ -320,9 +320,18 @@ a.reindex-page {
   display: none;
 }
 
-#hot-reload-button,
+#studio-buttons,
 #studio {
   display: none;
+}
+
+#designer-livepreview-message {
+  display: none;
+  text-align: center;
+}
+
+#designer-livepreview-login {
+  cursor: pointer;
 }
 
 #loading {

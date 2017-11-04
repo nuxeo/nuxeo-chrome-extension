@@ -72,24 +72,6 @@ limitations under the License.
       $('#loading').css('display', 'none');
     }
 
-    function noPkgFound() {
-      $('#nopkg').css('display', 'block');
-      setTimeout(() => {
-        $('#nopkg').fadeOut('fast');
-      }, 2000);
-    }
-
-    function stopSearching() {
-      $('#message').css('display', 'none');
-      noPkgFound();
-    }
-
-    function registerLink(element, url) {
-      $(element).click(() => {
-        app.browser.createTabs(url, bkg.studioExt.server.tabId);
-      });
-    }
-
     function showDependencyError(deps) {
       let nuxeoctlCommand = 'nuxeoctl mp-install';
       deps.forEach((dep) => {
@@ -116,6 +98,87 @@ limitations under the License.
       $('div.nuxeoctl-command').empty();
       $('div.shade').hide();
       $('div.deps-popup').hide();
+    }
+
+    function studioPackageFound(packageName) {
+      $('#no-studio-buttons').css('display', 'none');
+      $('#studio').css('display', 'flex');
+      $('#studio-buttons').css('display', 'block');
+
+      if (bkg.designerLivePreview.isEnabled()) {
+        $('#designer-livepreview-button').addClass('enabled');
+        $('#designer-livepreview-button').removeClass('disabled');
+      } else {
+        $('#designer-livepreview-button').addClass('disabled');
+        $('#designer-livepreview-button').removeClass('enabled');
+      }
+
+      const studioUrl = `${bkg.CONNECT_URL}/nuxeo/site/studio/ide?project=${packageName}`;
+      $('#designer-livepreview-login').attr('href', studioUrl);
+      $('#studio').click(() => {
+        let connectUrl = 'https://connect.nuxeo.com/';
+        chrome.storage.sync.get('value', (res) => {
+          if (res.value && res.value.length > 0) {
+            connectUrl = res.value;
+          }
+          const studioUrl = `${connectUrl}nuxeo/site/studio/ide?project=${pkgName}`;
+          app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
+        });
+      });
+      $('#hot-reload-button').click(() => {
+        bkg.bkgHotReload(startLoadingHR, stopLoading, true, showDependencyError);
+      });
+      $('#designer-livepreview-button').click(() => {
+        if (bkg.designerLivePreview.isEnabled()) {
+          bkg.designerLivePreview.disable();
+          $('#designer-livepreview-button').removeClass('enabled');
+          $('#designer-livepreview-button').addClass('disabled');
+        } else {
+          bkg.designerLivePreview.enable(packageName, bkg.studioExt.server.url)
+            .then(() => {
+              $('#designer-livepreview-button').addClass('enabled');
+              $('#designer-livepreview-button').removeClass('disabled');
+            })
+            .catch(() => {
+              $('#designer-livepreview-message').css('display', 'block');
+              setTimeout(() => {
+                $('#designer-livepreview-message').css('display', 'none');
+              }, 5000);
+            });
+        }
+      });
+      $('#force-hot-reload-button').click(() => {
+        bkg.bkgHotReload(startLoadingHR, stopLoading, false, showDependencyError);
+        hideDependencyError();
+        bkg.persistVar('dependencyMismatch', false);
+      });
+      $('#cancel-button').click(() => {
+        hideDependencyError();
+        bkg.persistVar('dependencyMismatch', false);
+        $('html').css('height', 'auto');
+      });
+    }
+
+    function noStudioPackageFound() {
+      $('#studio, #studio-buttons').css('display', 'none');
+      $('#no-studio-buttons').css('display', 'block');
+      $('#message').css('display', 'none');
+      $('#nopkg').css('display', 'block');
+      $('#studio, #hot-reload-button').click(() => {
+        bkg.notification('no_studio_project',
+          'No associated Studio project',
+          'If you\'d like to use this function, please associate your Nuxeo server with a studio project',
+          '../images/access_denied.png');
+      });
+      setTimeout(() => {
+        $('#nopkg');
+      }, 5000);
+    }
+
+    function registerLink(element, url) {
+      $(element).click(() => {
+        app.browser.createTabs(url, bkg.studioExt.server.tabId);
+      });
     }
 
     function checkDependencyMismatch() {
@@ -258,44 +321,12 @@ limitations under the License.
           }).catch((e) => {
             console.log(e);
           });
-        bkg.executeScript(checkStudioPkg, stopSearching, (text) => {
+        bkg.executeScript(checkStudioPkg, noStudioPackageFound, (text) => {
           const pkgName = JSON.parse(text).studio;
           if (pkgName) {
-            $('#message').css('display', 'none');
-            $('#studio, #hot-reload-button').css('display', 'flex');
-            $('#studio').click(() => {
-              let connectUrl = 'https://connect.nuxeo.com/';
-              chrome.storage.sync.get('value', (res) => {
-                if (res.value && res.value.length > 0) {
-                  connectUrl = res.value;
-                }
-                const studioUrl = `${connectUrl}nuxeo/site/studio/ide?project=${pkgName}`;
-                app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
-              });
-            });
-            $('#hot-reload-button').click(() => {
-              bkg.bkgHotReload(startLoadingHR, stopLoading, true, showDependencyError);
-            });
-            $('#force-hot-reload-button').click(() => {
-              bkg.bkgHotReload(startLoadingHR, stopLoading, false, showDependencyError);
-              hideDependencyError();
-              bkg.persistVar('dependencyMismatch', false);
-            });
-            $('#cancel-button').click(() => {
-              hideDependencyError();
-              bkg.persistVar('dependencyMismatch', false);
-              $('html').css('height', 'auto');
-            });
+            studioPackageFound(pkgName);
           } else {
-            $('#studio, #hot-reload-button').css('display', 'none');
-            $('#message').css('display', 'none');
-            noPkgFound();
-            $('#studio, #hot-reload-button').click(() => {
-              bkg.notification('no_studio_project',
-                'No associated Studio project',
-                'If you\'d like to use this function, please associate your Nuxeo server with a studio project',
-                '../images/access_denied.png');
-            });
+            noStudioPackageFound();
           }
         });
 
@@ -603,7 +634,7 @@ limitations under the License.
           $('#loading-gif').css('display', 'none');
           $('#search').css('text-indent', '5px');
         } else if (((input.toUpperCase()).indexOf('SELECT ') !== -1)
-            && ((input.toUpperCase()).indexOf(' FROM ') !== -1)) {
+          && ((input.toUpperCase()).indexOf(' FROM ') !== -1)) {
           const query = input.replace(/'/g, '"');
           docSearch(query, input);
           $('#loading-gif').css('display', 'none');

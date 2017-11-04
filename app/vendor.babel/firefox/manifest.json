@@ -43,6 +43,7 @@
     "<all_urls>",
     "cookies",
     "https://app.prodpad.com/",
-    "storage"
+    "storage",
+    "webRequestBlocking"
   ]
 }

@@ -11,6 +11,7 @@
   "default_locale": "en",
   "background": {
     "scripts": [
+      "../../../node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
       "../../../node_modules/nuxeo/nuxeo.js",
       "../../../app/libs/purify.min.js",
       "../../../app/vendor/chrome/chrome-bkg.js",
@@ -31,6 +32,7 @@
     "declarativeContent",
     "<all_urls>",
     "webRequest",
+    "webRequestBlocking",
     "https://app.prodpad.com/"
   ],
   "omnibox": {
