@@ -8,9 +8,12 @@ window.executeScript = (script, stopSearch, callback) => {
     mymeType: 'text/plain',
   });
 
-  newDefaultNuxeo().operation('RunInputScript').params({
-    type: 'groovy',
-  }).input(blob)
+  newDefaultNuxeo()
+    .operation('RunInputScript')
+    .params({
+      type: 'groovy',
+    })
+    .input(blob)
     .execute()
     .then(res => res.text())
     .then(callback)

@@ -131,6 +131,7 @@ ul {
 
 .nav-link {
   text-align-last: justify;
+  padding-left: 5px;
 }
 
 .useful-links,
@@ -158,6 +159,7 @@ HEADINGS
 
 .heading > .nxrow {
   padding-left: 10px;
+  padding-right: 10px;
   background: #0D112A;
 }
 
@@ -186,6 +188,7 @@ HEADINGS
 .server-name {
   font-size: 15px;
   color: #006CFA;
+  margin-bottom: 5px;
 }
 
 .server-name-url {
@@ -244,7 +247,8 @@ HEADINGS
 BUTTONS
 ==============================================================================*/
 .buttons{
-  margin-left: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 a.button {
@@ -335,7 +339,7 @@ a.reindex-page {
   margin: 20px;
 }
 
-#traces-button.enabled {
+.button.enabled {
   border-color: #0D112A;
   line-height: 13px;
   border-style: solid;
@@ -389,10 +393,6 @@ a.useful-link {
 /*==============================================================================
 SEARCH
 ==============================================================================*/
-form {
-  height: 25px;
-}
-
 .search-container {
   position: relative;
   z-index: 8;
@@ -428,14 +428,13 @@ form {
 
 .searchclear {
     position: absolute;
-    height: 20px;
     margin: auto;
     font-size: 20px;
     cursor: pointer;
     font-weight: normal;
     color: #ccc;
     right: 8px;
-    top: 4px;
+    top: 6px;
 }
 
 #search-repo {

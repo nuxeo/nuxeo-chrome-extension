@@ -16,7 +16,6 @@ limitations under the License.
 
 const nxPattern = /(^https?:\/\/[A-Za-z_\.0-9:-]+\/[A-Za-z_\.0-9-]+\/)(?:(?:nxdoc|nxpath|nxsearch|nxadmin|nxhome|nxdam|nxdamid|site\/[A-Za-z_\.0-9-]+)\/[A-Za-z_\.0-9-]+|view_documents\.faces|ui\/#!\/|[a-zA-Z0-9_%]+\/?|view_domains\.faces|home\.html|view_home\.faces)/;
 
-const window = window || {}; // eslint-disable-line no-use-before-define
 window.app = window.app || {};
 const studioExt = window.studioExt = window.studioExt || {};
 
