@@ -82,12 +82,19 @@
 
       <div class="heading">
         <div class="nxrow">
-          <div class="logo">
+          <div class="logo" id="logo">
           </div>
           <div class="server-main">
             <ul>
               <li class="server-name">Connected to Nuxeo Server:</li>
               <li><div class="server-name-url"></div></li>
+              <li id="connect-url">
+                <form class="search-container">
+                  <input type="text" id="connect-url-input" class="form" placeholder="https://connect.nuxeo.com" results="5" />
+                  <span class="reset" id="reset">	&#128683;</span>
+                  <span class="save" id="save">	&#128190;</span>
+                </form>
+              </li>
             </ul>
           </div>
           <a id="about" href="about.html">About</a>

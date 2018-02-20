@@ -162,9 +162,11 @@ HEADINGS
 }
 
 .logo {
+  margin-top: 10px;
+  align-self: flex-start;
   background-image: url("../images/nuxeo_block-30.png");
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
 }
 
 .server-main {
@@ -191,6 +193,31 @@ HEADINGS
   font-size: 20px;
   font-weight: bold;
   color: #fff;
+}
+
+.save, .reset {
+    position: absolute;
+    height: 15px;
+    margin: auto;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: normal;
+    color: #ccc;
+    right: 8px;
+    top: 4px;
+}
+
+#reset {
+  display: none;
+}
+
+#connect-url {
+  margin-top: 10px;
+  display: none;
+}
+
+#connect-url-input {
+  width: 400px;
 }
 
 /*==============================================================================

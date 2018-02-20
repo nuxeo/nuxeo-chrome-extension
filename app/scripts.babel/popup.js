@@ -163,6 +163,61 @@ limitations under the License.
         $('#nxql-docid').val('');
       });
 
+      $('#logo').click(() => {
+        $('#connect-url').toggle();
+      });
+
+      chrome.storage.sync.get('value', (res) => {
+        if (res.value && res.value.length > 0) {
+          $('#logo').css('background-image', 'url("../images/nuxeo-contrast.png")');
+          $('#connect-url-input').val(res.value);
+          $('#save').hide();
+          $('#reset').show();
+        } else {
+          $('#logo').css('background-image', 'url("../images/nuxeo_block-30.png")');
+          $('#save').show();
+          $('#reset').hide();
+        }
+      });
+
+      $('#save').click(() => {
+        const input = $('#connect-url-input').val();
+        if (input.length > 0) {
+          $.confirm({
+            title: 'Change Connect URL',
+            text: `Click Save to change your Connect URL to \n <span style="color:#8400FF">${input}</span>`,
+            confirmButton: 'Save',
+            cancelButton: 'Cancel',
+            confirm: () => {
+              chrome.storage.sync.set({ value: input }, () => {
+                $('#logo').css('background-image', 'url("../images/nuxeo-contrast.png")');
+                $('#save').hide();
+                $('#reset').show();
+                $('#connect-url').hide();
+              });
+            },
+          });
+        }
+      });
+
+      $('#reset').click(() => {
+        $.confirm({
+          title: 'Reset Connect URL',
+          text: 'Click Reset to reset your Connect URL to <span style="color:#8400FF">https://connect.nuxeo.com/</span>',
+          confirmButton: 'Reset',
+          cancelButton: 'Cancel',
+          confirm: () => {
+            chrome.storage.sync.clear(() => {
+              $('#logo').css('background-image', 'url("../images/nuxeo_block-30.png")');
+              $('#save').show();
+              $('#reset').hide();
+              $('#connect-url-input').val('');
+              $('#connect-url').hide();
+            });
+          },
+        });
+      });
+
       checkDependencyMismatch();
 
       let onUI;
@@ -214,9 +269,14 @@ limitations under the License.
             $('#studio, #hot-reload-button').css('display', 'flex');
             $('#studio').click(() => {
               _gaq.push(['_trackEvent', 'studio', 'clicked']);
-
-              const studioUrl = `https://connect.nuxeo.com/nuxeo/site/studio/ide?project=${pkgName}`;
-              app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
+              let connectUrl = 'https://connect.nuxeo.com/';
+              chrome.storage.sync.get('value', (res) => {
+                if (res.value && res.value.length > 0) {
+                  connectUrl = res.value;
+                }
+                const studioUrl = `${connectUrl}nuxeo/site/studio/ide?project=${pkgName}`;
+                app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
+              });
             });
             $('#hot-reload-button').click(() => {
               bkg.bkgHotReload(startLoadingHR, stopLoading, true, showDependencyError);

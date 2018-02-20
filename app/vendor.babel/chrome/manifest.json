@@ -18,6 +18,7 @@
     "persistent": true
   },
   "permissions": [
+    "storage",
     "cookies",
     "tabs",
     "http://*/*",
