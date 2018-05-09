@@ -2,8 +2,10 @@ module.exports = function () {
   function injectMocks() {
     return browser.execute(() => {
       chrome.tabs.create.callsFake((opts) => {
-        // window.document.location = opts.url;
         window.open(opts.url);
+      });
+      chrome.storage.sync.get.callsFake(() => {
+        window.open('https://connect.nuxeo.com/nuxeo/site/studio/ide?project=bde-test');
       });
     });
   }
