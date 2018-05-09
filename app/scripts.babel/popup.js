@@ -324,11 +324,11 @@ limitations under the License.
         registerLink('#automation-doc', nuxeo._baseURL.concat('site/automation/doc/'));
         registerLink('#api-playground', ('http://nuxeo.github.io/api-playground/#/').concat(serverURL));
         registerLink('#explorer', 'https://explorer.nuxeo.com');
-        registerLink('#nxql', 'https://doc.nuxeo.com/display/NXDOC/NXQL');
-        registerLink('#el-scripting', 'https://doc.nuxeo.com/display/NXDOC/Understand+Expression+and+Scripting+Languages+Used+in+Nuxeo');
-        registerLink('#mvel', 'https://doc.nuxeo.com/display/NXDOC/Use+of+MVEL+in+Automation+Chains');
-        registerLink('#workflow-variables', 'https://doc.nuxeo.com/display/NXDOC/Variables+Available+in+the+Automation+Context');
-        registerLink('#escalation-rules', 'https://doc.nuxeo.com/display/NXDOC/Escalation+Service');
+        registerLink('#nxql', 'https://doc.nuxeo.com/nxdoc/nxql/');
+        registerLink('#el-scripting', 'https://doc.nuxeo.com/nxdoc/understand-expression-and-scripting-languages-used-in-nuxeo/');
+        registerLink('#mvel', 'https://doc.nuxeo.com/nxdoc/use-of-mvel-in-automation-chains/');
+        registerLink('#workflow-variables', 'https://doc.nuxeo.com/nxdoc/variables-available-in-the-automation-context/');
+        registerLink('#escalation-rules', 'https://doc.nuxeo.com/nxdoc/escalation-service/');
         registerLink('#nuxeo-elements', 'https://www.webcomponents.org/author/nuxeo');
         registerLink('#nuxeo-layouts', 'http://showcase.nuxeo.com/nuxeo/layoutDemo/');
         registerLink('#style-guide', 'http://showcase.nuxeo.com/nuxeo/styleGuide/');
