@@ -11,7 +11,7 @@
   <name>Functional Tests for Nuxeo Browser Extension on latest Nuxeo 9.10 HF</name>
 
   <properties>
-    <nuxeo.tested.version>[9.10,10.0)</nuxeo.tested.version>
+    <nuxeo.tested.version>[9.10]</nuxeo.tested.version>
   </properties>
 
   <dependencies>
@@ -160,6 +160,27 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
+    <repository>
+      <id>hotfix-releases</id>
+      <url>https://mavenin.nuxeo.com/nexus/content/repositories/hotfix-releases</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>hotfix-snapshots</id>
+      <url>https://mavenin.nuxeo.com/nexus/content/repositories/hotfix-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <updatePolicy>always</updatePolicy>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
   </repositories>
 
   <pluginRepositories>
@@ -178,6 +199,27 @@
       <id>public-snapshot</id>
       <url>http://maven.nuxeo.org/nexus/content/groups/public-snapshot</url>
       <name>Nuxeo virtual snapshot repository</name>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <updatePolicy>always</updatePolicy>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+    <pluginRepository>
+      <id>hotfix-releases</id>
+      <url>https://mavenin.nuxeo.com/nexus/content/repositories/hotfix-releases</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+    <pluginRepository>
+      <id>hotfix-snapshots</id>
+      <url>https://mavenin.nuxeo.com/nexus/content/repositories/hotfix-snapshots</url>
       <releases>
         <enabled>false</enabled>
       </releases>
