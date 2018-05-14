@@ -18,11 +18,6 @@ limitations under the License.
   window.app = window.app || {};
   const app = window.app;
 
-  const _AnalyticsCode = 'UA-79232642-1';
-  const _gaq = _gaq || []; // eslint-disable-line no-use-before-define
-  _gaq.push(['_setAccount', _AnalyticsCode]);
-  _gaq.push(['_trackPageview']);
-
   const checkStudioPkg = `import groovy.json.JsonOutput;
     import org.nuxeo.connect.packages.PackageManager;
     import org.nuxeo.connect.client.we.StudioSnapshotHelper;
@@ -36,33 +31,10 @@ limitations under the License.
 
     println JsonOutput.toJson([studio: pkgName]);`;
 
-  (function () {
-    const ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = 'https://ssl.google-analytics.com/ga.js';
-    const s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-  function trackButtonClick(e) {
-    _gaq.push(['_trackEvent', e.target.id, 'clicked']);
-  }
-
   function escapeHTML(str) {
     return str.replace(/[&"'<>]/g,	m	=>	escapeHTML.replacements[m]);
   }
   escapeHTML.replacements = { '&': '&amp;', '"': '&quot;', '\'': '&#39;', '<': '&lt;', '>': '&gt;' };
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const buttons = document.querySelectorAll('a');
-    const debug = document.getElementById('traces-button');
-    const exportCurrent = document.getElementById('export-current');
-    const jsonSearch = document.getElementById('search');
-    for (let i = 0; i < buttons.length; i += 1) {
-      buttons[i].addEventListener('click', trackButtonClick);
-    }
-    debug.addEventListener('click', trackButtonClick);
-    exportCurrent.addEventListener('click', trackButtonClick);
-    jsonSearch.addEventListener('click', trackButtonClick);
-  });
 
   app.browser.getBackgroundPage((bkg) => {
     function debounce(fn, delay) {
@@ -79,14 +51,12 @@ limitations under the License.
     let position;
 
     function startLoadingHR() {
-      _gaq.push(['_trackEvent', 'hot-reload-button', 'clicked']);
       const a = $('a#hot-reload-button');
       position = a.position();
       $('#loading').css({ display: 'block', top: (position.top - 5), left: (position.left - 50) });
     }
 
     function startLoadingRS() {
-      _gaq.push(['_trackEvent', 'restart-button', 'clicked']);
       const a = $('a#restart-button');
       position = a.position();
       $('#loading').css({ display: 'block', top: (position.top - 5), left: (position.left - 50) });
@@ -268,7 +238,6 @@ limitations under the License.
             $('#message').css('display', 'none');
             $('#studio, #hot-reload-button').css('display', 'flex');
             $('#studio').click(() => {
-              _gaq.push(['_trackEvent', 'studio', 'clicked']);
               let connectUrl = 'https://connect.nuxeo.com/';
               chrome.storage.sync.get('value', (res) => {
                 if (res.value && res.value.length > 0) {
