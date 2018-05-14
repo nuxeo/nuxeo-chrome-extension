@@ -12,6 +12,7 @@
   "background": {
     "scripts": [
       "../../../node_modules/nuxeo/nuxeo.js",
+      "../../../app/libs/purify.min.js",
       "../../../app/vendor/chrome/chrome-bkg.js",
       "../../../app/scripts/bkg.js"
     ],

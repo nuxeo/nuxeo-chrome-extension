@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+/* global DOMPurify */
+
 (function (window) {
   window.app = window.app || {};
   const app = window.app;
@@ -30,11 +32,6 @@ limitations under the License.
     def bundles = RuntimeInstrospection.getInfo();
 
     println JsonOutput.toJson([studio: pkgName]);`;
-
-  function escapeHTML(str) {
-    return str.replace(/[&"'<>]/g,	m	=>	escapeHTML.replacements[m]);
-  }
-  escapeHTML.replacements = { '&': '&amp;', '"': '&quot;', '\'': '&#39;', '<': '&lt;', '>': '&gt;' };
 
   app.browser.getBackgroundPage((bkg) => {
     function debounce(fn, delay) {
@@ -285,7 +282,7 @@ limitations under the License.
             }
           });
 
-        const serverString = escapeHTML(nuxeo._baseURL);
+        const serverString = DOMPurify.sanitize(nuxeo._baseURL);
         $('div.server-name-url').html(serverString);
 
         const serverURL = nuxeo._baseURL.replace(/\/$/, '');
@@ -391,7 +388,7 @@ limitations under the License.
                 getJsonFromGuid(event.target.id);
               });
             } else {
-              const searchTerm = escapeHTML(input);
+              const searchTerm = DOMPurify.sanitize(input);
               $('.no-result span').text(searchTerm);
               $('.no-result').css('display', 'block');
             }
@@ -409,7 +406,7 @@ limitations under the License.
 
       let openJsonWindow = (jsonObject) => {
         const jsonString = JSON.stringify(jsonObject, undefined, 2);
-        bkg._text = escapeHTML(jsonString);
+        bkg._text = DOMPurify.sanitize(jsonString);
         app.browser.createTabs('json.html', bkg.studioExt.server.tabId);
       };
 

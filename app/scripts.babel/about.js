@@ -1,8 +1,3 @@
-function escapeHTML(str) {
-  return str.replace(/[&"'<>]/g, m => escapeHTML.replacements[m]);
-}
-escapeHTML.replacements = { '&': '&amp;', '"': '&quot;', '\'': '&#39;', '<': '&lt;', '>': '&gt;' };
-
 $(() => {
   app.browser.getBackgroundPage((bkg) => {
     $('#apache').click(() => {

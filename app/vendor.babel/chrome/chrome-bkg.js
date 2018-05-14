@@ -1,3 +1,4 @@
+/* global DOMPurify */
 
 let tabUrl;
 let docUrl;
@@ -105,12 +106,6 @@ function openDocFromPath(path, url) {
     });
 }
 
-function encodeXml(str) {
-  const holder = document.createElement('div');
-  holder.textContent = str;
-  return holder.innerHTML;
-}
-
 chrome.omnibox.onInputChanged.addListener(
   (text, suggest) => {
     getCurrentTabUrl((url) => {
@@ -131,13 +126,13 @@ chrome.omnibox.onInputChanged.addListener(
               (res.entries).forEach((doc) => {
                 suggestions.push({
                   content: doc.uid,
-                  description: `<match>${encodeXml(doc.title)}</match> <dim>${encodeXml(doc.path)}</dim>`,
+                  description: DOMPurify.sanitize(`<match>${doc.title}</match> <dim>${doc.path}</dim>`, { ALLOWED_TAGS: ['match', 'dim'] }),
                 });
               });
             }
             if ((res.entries).length > 5) {
               chrome.omnibox.setDefaultSuggestion({
-                description: '<dim>Want more results? Try the</dim> <match>fulltext searchbox</match> <dim>from the Nuxeo Dev Tools extension window.</dim>',
+                description: DOMPurify.sanitize('<dim>Want more results? Try the</dim> <match>fulltext searchbox</match> <dim>from the Nuxeo Dev Tools extension window.</dim>', { ALLOWED_TAGS: ['match', 'dim'] }),
               });
             }
             suggest(suggestions);
@@ -161,13 +156,13 @@ chrome.omnibox.onInputChanged.addListener(
               (res.entries).forEach((doc) => {
                 suggestions.push({
                   content: doc.uid,
-                  description: `<match>${encodeXml(doc.title)}</match> <dim>${encodeXml(doc.path)}</dim>`,
+                  description: DOMPurify.sanitize(`<match>${doc.title}</match> <dim>${doc.path}</dim>`, { ALLOWED_TAGS: ['match', 'dim'] }),
                 });
               });
             }
             if ((res.entries).length > 5) {
               chrome.omnibox.setDefaultSuggestion({
-                description: '<dim>Want more results? Try the</dim> <match>fulltext searchbox</match> <dim>from the Nuxeo Dev Tools extension window.</dim>',
+                description: DOMPurify.sanitize('<dim>Want more results? Try the</dim> <match>fulltext searchbox</match> <dim>from the Nuxeo Dev Tools extension window.</dim>', { ALLOWED_TAGS: ['match', 'dim'] }),
               });
             }
             suggest(suggestions);

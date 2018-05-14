@@ -16,7 +16,7 @@ limitations under the License.
 
 $(() => {
   chrome.runtime.getBackgroundPage((bkg) => {
-    document.getElementById('json-string').innerHTML = bkg._text;
+    document.getElementById('json-string').textContent = bkg._text;
     hljs.initHighlighting();
   });
 });
