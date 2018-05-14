@@ -10,7 +10,6 @@
     "babel-eslint": "^7.2.3",
     "babel-preset-es2015": "^6.24.1",
     "babel-register": "^6.24.1",
-    "bower": "^1.8.2",
     "chai": "^4.1.0",
     "chimp": "^0.49.1",
     "del": "^2.2.0",
@@ -65,7 +64,6 @@
     }
   },
   "scripts": {
-    "postinstall": "bower install",
     "build": "gulp build",
     "qa": "gulp clean build:sinon-chrome package && chimp test/chimp-ci.conf.js",
     "pretest": "gulp clean build",

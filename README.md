@@ -45,7 +45,7 @@ Features include:
 * [CORS config](https://doc.nuxeo.com/pages/viewpage.action?pageId=14257084) must be activated in your Nuxeo server to connect to your repository on API Playground.
 
 ## Build
-### GitHub
+
 ```
 $ git clone git@github.com:nuxeo/nuxeo-browser-extension.git
 $ cd nuxeo-browser-extension

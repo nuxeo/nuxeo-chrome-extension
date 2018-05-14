@@ -38,34 +38,40 @@ function pipe(src, transforms, dest) {
   return stream;
 }
 
+// Create WIP build bersion based on date and time
 let buildNumber = (() => {
   // Ensure build number is the same if FF and Chrome are built together.
-  let build = moment.utc().format('DDDDHH');
+  let build = moment.utc().format('DDMM.HHmm');
   return function () {
     return build;
   }
 })();
 
-let releaseVersion = function (vendor) {
-  let [major, minor, build] = readVersion(vendor);
-  getVersion = releaseVersion;
-  return `${major}.${parseInt(minor) + 1}.0`;
-}
-
-let buildVersion = function (vendor) {
-  let [major, minor, build] = readVersion(vendor);
-  return `${major}.${minor}.${buildNumber()}`
-}
-
-let getVersion = buildVersion;
-
+// Get version from manifest
 function readVersion(vendor) {
   let manifest = require(`./app/vendor/${vendor}/manifest.json`);
   return manifest.version.split('\.');
 }
 
-function updateVersionForRelease(vendor, distFile) {
-  let version = releaseVersion(vendor);
+// Increment build version
+let buildVersion = function (vendor) {
+  let [major, minor, build] = readVersion(vendor);
+  return `${major}.${minor}.${buildNumber()}`
+}
+
+// Increment minor version
+let minorVersion = function (vendor) {
+  let [major, minor, build] = readVersion(vendor);
+  return `${major}.${parseInt(minor) + 1}.0`;
+}
+
+// Increment major version
+let majorVersion = function (vendor) {
+  let [major, minor, build] = readVersion(vendor);
+  return `${parseInt(major) + 1}.0.0`;
+}
+
+function updateVersionForRelease(vendor, version, distFile) {
 
   util.log(`Releasing ${vendor} Extension: ${version}`);
   // Update sources Manifest
@@ -75,7 +81,7 @@ function updateVersionForRelease(vendor, distFile) {
     }))
     .pipe(gulp.dest(`app/vendor/${vendor}`));
 
-  gulp.src(`app/vendor/${vendor}/manifest.json`)
+  gulp.src(`dist/${vendor}/manifest.json`)
     .pipe($.chromeManifest({
       buildnumber: version,
       background: {
@@ -131,6 +137,16 @@ gulp.task('extras', () => {
   }).pipe(gulp.dest(dist()));
 });
 
+gulp.task('scripts', () => {
+  return gulp.src('app/scripts.babel/*.js')
+    .pipe(gulp.dest(dist('base/scripts')));
+});
+
+gulp.task('styles', () => {
+  return gulp.src('app/styles/*.css')
+    .pipe(gulp.dest(dist('base/styles')));
+});
+
 gulp.task('images', () => {
   return gulp.src('app/images/**/*')
     .pipe($.if($.if.isFile, $.cache($.imagemin({
@@ -163,24 +179,130 @@ gulp.task('vendor:firefox', ['babel'], () => {
 
 gulp.task('html', ['vendor:chrome', 'vendor:firefox'], () => {
   return gulp.src('app/*.html')
-    .pipe($.sourcemaps.init())
-    .pipe($.if('*.js', $.uglify()))
-    .pipe($.if('*.css', $.minifyCss({
-      compatibility: '*'
-    })))
-    .pipe($.sourcemaps.write())
-    .pipe($.useref({
-      searchPath: ['.tmp', 'app', '.']
-    }))
-    .pipe($.if('*.html', $.minifyHtml({
-      conditionals: true,
-      loose: true
-    })))
     .pipe(gulp.dest(dist()));
 });
 
+gulp.task('build:chrome', ['build:base'], (done) => {
+  if (version.length < 1) {
+    version = buildVersion('chrome');
+  }
+  gulp.src(dist('base', '**/*'))
+    .pipe(filter(['**', '!**/about.html']))
+    .pipe(gulp.dest(dist('chrome')));
+
+  gulp.src(dist('base', 'about.html'))
+    .pipe(cheerio(($) => {
+      const date = new Date().getFullYear();
+      $('#copyright').html(`&#169; ${date} Nuxeo`);
+      $('#version').html(`Version ${version}`);
+    }))
+    .pipe(gulp.dest(dist('chrome')));
+
+  util.log(`Building Chrome Extension: ${version}`);
+
+  gulp.src('app/vendor/chrome/manifest.json')
+    .pipe($.chromeManifest({
+      buildnumber: version,
+      background: {
+        target: 'scripts/background.js'
+      }
+    }))
+    .pipe(gulp.dest(dist('chrome')));
+
+  return runSequence('size', done);
+});
+
+gulp.task('build:sinon-chrome', ['build:chrome'], () => {
+  if (version.length < 1) {
+    version = buildVersion('sinon-chrome');
+  }
+  const target = 'sinon-chrome';
+  // Copy Chrome build
+  gulp.src(dist('chrome', '**/*'))
+    .pipe(filter(['**', '!**/popup.html']))
+    .pipe(filter(['**', '!**/about.html']))
+    .pipe(filter(['**', '!**/es-reindex.html']))
+    .pipe(gulp.dest(dist(target)));
+
+  // Add sinon-chrome.min script
+  gulp.src(require.resolve('sinon-chrome/bundle/sinon-chrome.min.js'))
+    .pipe(gulp.dest(dist(target, 'scripts')))
+
+  // Transpile and Copy injecter.js script
+  // gulp.src(path.join(__dirname, 'test', 'injecter.js'))
+  gulp.src(path.join('test', 'injecter.js'))
+    .pipe($.babel({
+      presets: ['es2015']
+    }))
+    .pipe(gulp.dest(dist(target, 'scripts')));
+
+  // Create a standalone index.html with background.js, sinon-chrome and a script injecter to manipulate mocks from Webdriverio.
+  gulp.src(dist('chrome', 'popup.html'))
+    .pipe(cheerio(($) => {
+      const $head = $('head');
+      // !! Order matters; as we use `prepend`, last added will be first.
+      prependScript($head, 'scripts/background.js');
+      prependScript($head, 'scripts/injecter.js')
+      prependScript($head, 'scripts/sinon-chrome.min.js');
+    }))
+    .pipe(gulp.dest(dist(target)));
+
+  gulp.src(dist('chrome', 'about.html'))
+    .pipe(cheerio(($) => {
+      const $head = $('head');
+      // !! Order matters; as we use `prepend`, last added will be first.
+      prependScript($head, 'scripts/background.js');
+      prependScript($head, 'scripts/injecter.js')
+      prependScript($head, 'scripts/sinon-chrome.min.js');
+      const date = new Date().getFullYear();
+      $('#copyright').html(`&#169; ${date} Nuxeo`);
+      $('#version').html(version);
+    }))
+    .pipe(gulp.dest(dist(target)));
+
+  gulp.src(dist('chrome', 'es-reindex.html'))
+    .pipe(cheerio(($) => {
+      const $head = $('head');
+      // !! Order matters; as we use `prepend`, last added will be first.
+      prependScript($head, 'scripts/background.js');
+      prependScript($head, 'scripts/injecter.js')
+      prependScript($head, 'scripts/sinon-chrome.min.js');
+    }))
+    .pipe(gulp.dest(dist(target)));
+});
+
+gulp.task('build:firefox', ['build:base', 'vendor:firefox'], (done) => {
+  if (version.length < 1) {
+    version = buildVersion('firefox');
+  }
+  gulp.src(dist('base', '**/*'))
+    .pipe(filter(['**', '!**/about.html']))
+    .pipe(gulp.dest(dist('firefox')));
+
+  gulp.src(dist('base', 'about.html'))
+    .pipe(cheerio(($) => {
+      const date = new Date().getFullYear();
+      $('#copyright').html(`&#169; ${date} Nuxeo`);
+      $('#version').html(`Version ${version}`);
+    }))
+    .pipe(gulp.dest(dist('firefox')));
+
+  util.log(`Building Firefox Extension: ${version}`);
+
+  gulp.src('app/vendor/firefox/manifest.json')
+    .pipe($.chromeManifest({
+      buildnumber: version,
+      background: {
+        target: 'scripts/background.js'
+      }
+    }))
+    .pipe(gulp.dest(dist('firefox')));
+
+  return runSequence('size', done);
+});
+
 gulp.task('release:chrome', ['build:chrome'], (cb) => {
-  updateVersionForRelease('chrome');
+  updateVersionForRelease('chrome', version);
   return runSequence('zip:chrome', cb);
 });
 
@@ -283,14 +405,15 @@ gulp.task('wiredep', () => {
 });
 
 gulp.task('zip:chrome', () => {
-  let filename = `BrowserDeveloperExtension-Chrome-${getVersion('chrome')}.zip`;
+  let filename = `BrowserDeveloperExtension-Chrome-${version}.zip`;
   util.log(`Building file: ${filename}`);
   return gulp.src(dist('chrome', '**'))
     .pipe($.zip(filename))
     .pipe(gulp.dest('package/chrome'));
 });
+
 gulp.task('zip:firefox', () => {
-  let filename = `BrowserDeveloperExtension-Firefox-${getVersion('firefox')}.zip`;
+  let filename = `BrowserDeveloperExtension-Firefox-${version}.zip`;
   util.log(`Building file: ${filename}`);
   return gulp.src(dist('firefox', '**'))
     .pipe($.zip(filename))
@@ -311,121 +434,16 @@ gulp.task('base', () => {
     .pipe(gulp.dest(dist('chrome')));
 });
 
-gulp.task('build:base', ['images', 'extras', 'html']);
-
-gulp.task('build:chrome', ['build:base'], (done) => {
-  gulp.src(dist('base', '**/*'))
-    .pipe(filter(['**', '!**/about.html']))
-    .pipe(gulp.dest(dist('chrome')));
-
-  gulp.src(dist('base', 'about.html'))
-    .pipe(cheerio(($) => {
-      const date = new Date().getFullYear();
-      $('#copyright').html(`&#169; ${date} Nuxeo`);
-      $('#version').html(`Version ${version}`);
-    }))
-    .pipe(gulp.dest(dist('chrome')));
-
-  version = getVersion('chrome');
-  util.log(`Building Chrome Extension: ${version}`);
-
-  gulp.src('app/vendor/chrome/manifest.json')
-    .pipe($.chromeManifest({
-      buildnumber: version,
-      background: {
-        target: 'scripts/background.js'
-      }
-    }))
-    .pipe(gulp.dest(dist('chrome')));
-
-  return runSequence('size', done);
-});
-
-gulp.task('build:sinon-chrome', ['build:chrome'], () => {
-  const target = 'sinon-chrome';
-  // Copy Chrome build
-  gulp.src(dist('chrome', '**/*'))
-    .pipe(filter(['**', '!**/popup.html']))
-    .pipe(filter(['**', '!**/about.html']))
-    .pipe(filter(['**', '!**/es-reindex.html']))
-    .pipe(gulp.dest(dist(target)));
-
-  // Add sinon-chrome.min script
-  gulp.src(require.resolve('sinon-chrome/bundle/sinon-chrome.min.js'))
-    .pipe(gulp.dest(dist(target, 'scripts')))
-
-  // Transpile and Copy injecter.js script
-  // gulp.src(path.join(__dirname, 'test', 'injecter.js'))
-  gulp.src(path.join('test', 'injecter.js'))
-    .pipe($.babel({
-      presets: ['es2015']
-    }))
-    .pipe(gulp.dest(dist(target, 'scripts')));
-
-  // Create a standalone index.html with background.js, sinon-chrome and a script injecter to manipulate mocks from Webdriverio.
-  gulp.src(dist('chrome', 'popup.html'))
-    .pipe(cheerio(($) => {
-      const $head = $('head');
-      // !! Order matters; as we use `prepend`, last added will be first.
-      prependScript($head, 'scripts/background.js');
-      prependScript($head, 'scripts/injecter.js')
-      prependScript($head, 'scripts/sinon-chrome.min.js');
-    }))
-    .pipe(gulp.dest(dist(target)));
-
-  gulp.src(dist('chrome', 'about.html'))
-    .pipe(cheerio(($) => {
-      const $head = $('head');
-      // !! Order matters; as we use `prepend`, last added will be first.
-      prependScript($head, 'scripts/background.js');
-      prependScript($head, 'scripts/injecter.js')
-      prependScript($head, 'scripts/sinon-chrome.min.js');
-      const date = new Date().getFullYear();
-      $('#copyright').html(`&#169; ${date} Nuxeo`);
-      $('#version').html(version);
-    }))
-    .pipe(gulp.dest(dist(target)));
-
-  gulp.src(dist('chrome', 'es-reindex.html'))
-    .pipe(cheerio(($) => {
-      const $head = $('head');
-      // !! Order matters; as we use `prepend`, last added will be first.
-      prependScript($head, 'scripts/background.js');
-      prependScript($head, 'scripts/injecter.js')
-      prependScript($head, 'scripts/sinon-chrome.min.js');
-    }))
-    .pipe(gulp.dest(dist(target)));
-});
-
-gulp.task('build:firefox', ['build:base', 'vendor:firefox'], (done) => {
-  gulp.src(dist('base', '**/*'))
-    .pipe(filter(['**', '!**/about.html']))
-    .pipe(gulp.dest(dist('firefox')));
-
-  gulp.src(dist('base', 'about.html'))
-    .pipe(cheerio(($) => {
-      const date = new Date().getFullYear();
-      $('#copyright').html(`&#169; ${date} Nuxeo`);
-      $('#version').html(`Version ${version}`);
-    }))
-    .pipe(gulp.dest(dist('firefox')));
-
-  version = getVersion('firefox');
-  util.log(`Building Firefox Extension: ${version}`);
-
-  gulp.src('app/vendor/firefox/manifest.json')
-    .pipe($.chromeManifest({
-      buildnumber: version,
-      background: {
-        target: 'scripts/background.js'
-      }
-    }))
-    .pipe(gulp.dest(dist('firefox')));
-
-  return runSequence('size', done);
-});
+gulp.task('build:base', ['images', 'extras', 'scripts', 'styles', 'html']);
 
 gulp.task('default', ['clean', 'build']);
 gulp.task('build', ['build:chrome', 'build:firefox', 'build:sinon-chrome']);
 gulp.task('package', ['package:chrome', 'package:firefox']);
-gulp.task('release', ['release:chrome', 'release:firefox']);
+gulp.task('release', () => {
+  version = minorVersion('chrome');
+  return runSequence(['release:chrome', 'release:firefox']);
+});
+gulp.task('release:major', () => {
+  version = majorVersion('chrome');
+  return runSequence(['release:chrome', 'release:firefox']);
+});
