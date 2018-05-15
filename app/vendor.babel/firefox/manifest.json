@@ -41,6 +41,7 @@
     "webRequest",
     "<all_urls>",
     "cookies",
-    "https://app.prodpad.com/"
+    "https://app.prodpad.com/",
+    "storage"
   ]
 }
