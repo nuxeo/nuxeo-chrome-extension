@@ -193,8 +193,8 @@ gulp.task('build:chrome', ['build:base'], (done) => {
   gulp.src(dist('base', 'about.html'))
     .pipe(cheerio(($) => {
       const date = new Date().getFullYear();
-      $('#copyright').html(`&#169; ${date} Nuxeo`);
-      $('#version').html(`Version ${version}`);
+      $('#copyright').append(`${date} Nuxeo`);
+      $('#version').text(`Version ${version}`);
     }))
     .pipe(gulp.dest(dist('chrome')));
 
@@ -255,8 +255,7 @@ gulp.task('build:sinon-chrome', ['build:chrome'], () => {
       prependScript($head, 'scripts/injecter.js')
       prependScript($head, 'scripts/sinon-chrome.min.js');
       const date = new Date().getFullYear();
-      $('#copyright').html(`&#169; ${date} Nuxeo`);
-      $('#version').html(version);
+      $('#version').text(`Version ${version}`);
     }))
     .pipe(gulp.dest(dist(target)));
 
@@ -282,8 +281,8 @@ gulp.task('build:firefox', ['build:base', 'vendor:firefox'], (done) => {
   gulp.src(dist('base', 'about.html'))
     .pipe(cheerio(($) => {
       const date = new Date().getFullYear();
-      $('#copyright').html(`&#169; ${date} Nuxeo`);
-      $('#version').html(`Version ${version}`);
+      $('#copyright').append(`${date} Nuxeo`);
+      $('#version').text(`Version ${version}`);
     }))
     .pipe(gulp.dest(dist('firefox')));
 

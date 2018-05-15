@@ -82,13 +82,13 @@ limitations under the License.
     }
 
     function showDependencyError(deps) {
-      let depsList = '';
       let nuxeoctlCommand = 'nuxeoctl mp-install';
       deps.forEach((dep) => {
-        depsList += `<li>${dep}</li>`;
+        const li = document.createElement('li');
+        li.textContent(`${dep}`);
+        $('#deps-list').append(li);
         nuxeoctlCommand += ` ${dep}`;
       });
-      $('#deps-list').append(depsList);
       $('div.nuxeoctl-command').append(nuxeoctlCommand);
       $('div.shade').show();
       $('div.deps-popup').show();
@@ -283,7 +283,7 @@ limitations under the License.
           });
 
         const serverString = DOMPurify.sanitize(nuxeo._baseURL);
-        $('div.server-name-url').html(serverString);
+        $('div.server-name-url').text(serverString);
 
         const serverURL = nuxeo._baseURL.replace(/\/$/, '');
 
@@ -337,17 +337,49 @@ limitations under the License.
       let height = $('html').height();
 
       function showSearchResults(icon, title, path, uid, vMajor, vMinor) {
-        let titleTag;
         const iconLink = nuxeo._baseURL.concat(icon);
-        const iconTag = `<td colspan=1 class="icon"><img class="doc-icon" src="${iconLink}" alt="icon"></td>`;
-        if ((typeof vMajor !== 'undefined' && typeof vMinor !== 'undefined')) {
-          titleTag = `<td colspan=18 class="doc-title" id="${uid}">${title} <span class="version">${vMajor}.${vMinor}</span></td>`;
+        const iconTag = document.createElement('td');
+        const image = document.createElement('img');
+        const titleTag = document.createElement('td');
+        const jsonTag = document.createElement('td');
+        const jsonIcon = document.createElement('div');
+        const pathTag = document.createElement('td');
+        const searchResult = document.createElement('tr');
+        const searchResultPath = document.createElement('tr');
+        iconTag.setAttribute('colspan', '1');
+        iconTag.className = 'icon';
+        image.className = 'doc-icon';
+        image.setAttribute('src', `${iconLink}`);
+        image.setAttribute('alt', 'icon');
+        iconTag.appendChild(image);
+        titleTag.setAttribute('colspan', '18');
+        titleTag.className = 'doc-title';
+        titleTag.id = `${uid}`;
+        if ((typeof vMajor !== 'undefined' && typeof vMinor !== 'undefined') && (vMajor !== 0 || vMinor !== 0)) {
+          titleTag.textContent = `${title} `;
+          const span = document.createElement('span');
+          span.className = 'version';
+          span.textContent = `v${vMajor}.${vMinor}`;
+          titleTag.appendChild(span);
         } else {
-          titleTag = `<td colspan=18 class="doc-title" id="${uid}">${title}</td>`;
+          titleTag.textContent = `${title}`;
         }
-        const jsonTag = `<td colspan=1 class="icon"><div class="json-icon" id="${uid}">&#9701;</div></td>`;
-        const pathTag = `<td colspan=20 class="doc-path">${path}</td>`;
-        $('tbody').append(`<tr class="search-result">${iconTag}${titleTag}${jsonTag}</tr><tr>${pathTag}</tr>`);
+        jsonTag.setAttribute('colspan', '1');
+        jsonTag.className = 'icon';
+        jsonIcon.className = 'json-icon';
+        jsonIcon.id = 'uid';
+        jsonIcon.textContent = '◥';
+        jsonTag.appendChild(jsonIcon);
+        pathTag.setAttribute('colspan', '20');
+        pathTag.className = 'doc-path';
+        pathTag.textContent = `${path}`;
+        searchResult.className = 'search-result';
+        searchResult.appendChild(iconTag);
+        searchResult.appendChild(titleTag);
+        searchResult.appendChild(jsonTag);
+        searchResultPath.appendChild(pathTag);
+        $('tbody').append(searchResult);
+        $('tbody').append(searchResultPath);
       }
 
       function docSearch(nxqlQuery, input) {
@@ -361,7 +393,16 @@ limitations under the License.
             if ((res.entries).length > 0) {
               $('.no-result').css('display', 'none');
               $('body').css('overflow-y', 'auto');
-              $('#search-results').append('<thead><tr><th colspan=20>Search Results:</td></tr></thead><tbody></tbody>');
+              const thead = document.createElement('thead');
+              const tr = document.createElement('tr');
+              const th = document.createElement('th');
+              const tbody = document.createElement('tbody');
+              th.setAttribute('colspan', '20');
+              th.textContent = 'Search Results:';
+              tr.appendChild(th);
+              thead.appendChild(tr);
+              $('#search-results').append(thead);
+              $('#search-results').append(tbody);
               $('table').css('margin-top', '20px');
               (res.entries).forEach((doc) => {
                 $('html').outerHeight($('html').height());
