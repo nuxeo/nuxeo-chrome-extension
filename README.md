@@ -41,8 +41,10 @@ Features include:
 
 * Multiple Nuxeo projects are not supported.
 * The extension is only active when a Nuxeo instance is in the current active tab.
-* The Hot Reload and Go To Studio buttons are only active *when a Studio project is associated with the current Nuxeo server*. You must also have Administrator access and have Dev Mode activated.
+* The Hot Reload and Go To Studio buttons are only active *when a Studio project is associated with the current Nuxeo server*.
+* You must also have Administrator access and have Dev Mode activated.
 * [CORS config](https://doc.nuxeo.com/pages/viewpage.action?pageId=14257084) must be activated in your Nuxeo server to connect to your repository on API Playground.
+* [Certain features in the Firefox addon](https://jira.nuxeo.com/browse/NXP-24828) won't work and will cause server errors with Nuxeo FT 10.1.
 
 ## Build
 
