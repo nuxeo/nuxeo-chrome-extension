@@ -191,9 +191,8 @@ limitations under the License.
       let nuxeo;
 
       function getJsonFromPath(input) {
-        input = input.replace(/%20/g, ' ');
-        input = input.replace(/%22/g, '"');
-        nuxeo.request(`/path/${input}`)
+        input = decodeURIComponent(input);
+        nuxeo.request(`/path${input}`)
           .schemas('*')
           .enrichers({ document: ['acls', 'permissions'] })
           .get({ resolveWithFullResponse: true })
@@ -302,7 +301,7 @@ limitations under the License.
         const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
         const pathPattern = /^\//;
         const docPattern = /nxpath\/[A-Za-z_\.0-9-]+(\/[A-Za-z\.0-9_\- \/%~:?#'"]+)|(?:nxdoc[\/A-Za-z_\.0-9]+)([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})/;
-        const uiDocPattern = /nuxeo\/ui\/#!\/browse(\/[A-Za-z\.0-9_\- \/%~:?#'"]+)|(?:nuxeo\/ui\/#!\/doc[\/A-Za-z_\.0-9]+)([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})/;
+        const uiDocPattern = /nuxeo\/ui\/#!\/browse(\/.+?(?=\?|$))|(?:nuxeo\/ui\/#!\/doc[\/A-Za-z_\.0-9]+)([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})/;
         const matchGroupDoc = docPattern.exec(bkg.tabUrl);
         const matchGroupUiDoc = uiDocPattern.exec(bkg.tabUrl);
 
