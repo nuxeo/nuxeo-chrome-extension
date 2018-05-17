@@ -518,12 +518,29 @@ form {
 }
 
 .json-icon {
-  color: #1F28BF;
+  height: 16px;
+  fill: #1F28BF;
   cursor:pointer;
 }
 
-.json-icon:hover {
-  color: #FF9E00;
+.json-icon:hover,
+.json-icon:hover #Line_Icons {
+  height: 16px;
+  fill: #FF9E00;
+  cursor:pointer;
+}
+
+.json-icon-large,
+#Line_Icons {
+  height: 19px;
+  fill: #1F28BF;
+  cursor:pointer;
+}
+
+.json-icon-large:hover,
+.json-icon-large:hover #Line_Icons {
+  height: 19px;
+  fill: #FF9E00;
   cursor:pointer;
 }
 
@@ -532,10 +549,9 @@ form {
 }
 
 #export-current {
-  text-align:left;
+  float: right;
   display: none;
   font-weight: bold;
-  margin-top: 15px;
   cursor: pointer;
 }
 

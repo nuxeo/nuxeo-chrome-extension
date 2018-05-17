@@ -341,7 +341,7 @@ limitations under the License.
         const image = document.createElement('img');
         const titleTag = document.createElement('td');
         const jsonTag = document.createElement('td');
-        const jsonIcon = document.createElement('div');
+        const jsonIcon = $('.json-icon-large').clone();
         const pathTag = document.createElement('td');
         const searchResult = document.createElement('tr');
         const searchResultPath = document.createElement('tr');
@@ -352,6 +352,7 @@ limitations under the License.
         image.setAttribute('alt', 'icon');
         iconTag.appendChild(image);
         titleTag.setAttribute('colspan', '18');
+        titleTag.setAttribute('title', 'Open document in another tab');
         titleTag.className = 'doc-title';
         titleTag.id = `${uid}`;
         if ((typeof vMajor !== 'undefined' && typeof vMinor !== 'undefined') && (vMajor !== 0 || vMinor !== 0)) {
@@ -365,10 +366,12 @@ limitations under the License.
         }
         jsonTag.setAttribute('colspan', '1');
         jsonTag.className = 'icon';
-        jsonIcon.className = 'json-icon';
-        jsonIcon.id = 'uid';
-        jsonIcon.textContent = '◥';
-        jsonTag.appendChild(jsonIcon);
+        jsonIcon.removeClass('json-icon-large');
+        jsonIcon.addClass('json-icon');
+        jsonIcon.attr('id', `${uid}`);
+        $('title', jsonIcon).text('View document JSON');
+        console.log(jsonIcon[0]);
+        jsonTag.appendChild(jsonIcon[0]);
         pathTag.setAttribute('colspan', '20');
         pathTag.className = 'doc-path';
         pathTag.textContent = `${path}`;
