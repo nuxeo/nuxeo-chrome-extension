@@ -33,6 +33,15 @@ limitations under the License.
 
     println JsonOutput.toJson([studio: pkgName]);`;
 
+  const checkAddons = `import groovy.json.JsonOutput;
+    import org.nuxeo.connect.packages.PackageManager;
+    import org.nuxeo.runtime.api.Framework;
+
+    def pm = Framework.getLocalService(PackageManager.class);
+    def addons = pm.listInstalledPackagesNames();
+
+    println JsonOutput.toJson([installed: addons]);`;
+
   app.browser.getBackgroundPage((bkg) => {
     function debounce(fn, delay) {
       let timer = null;
@@ -286,8 +295,17 @@ limitations under the License.
 
         const serverURL = nuxeo._baseURL.replace(/\/$/, '');
 
+        bkg.executeScript(checkAddons, null, (text) => {
+          let playgroundUrl = '';
+          if (JSON.parse(text).installed.includes('nuxeo-api-playground')) {
+            playgroundUrl = nuxeo._baseURL.concat('playground/#/').concat(serverURL);
+          } else {
+            playgroundUrl = ('http://nuxeo.github.io/api-playground/#/').concat(serverURL);
+          }
+          return registerLink('#api-playground', playgroundUrl);
+        });
+
         registerLink('#automation-doc', nuxeo._baseURL.concat('site/automation/doc/'));
-        registerLink('#api-playground', ('http://nuxeo.github.io/api-playground/#/').concat(serverURL));
         registerLink('#explorer', 'https://explorer.nuxeo.com');
         registerLink('#nxql', 'https://doc.nuxeo.com/nxdoc/nxql/');
         registerLink('#el-scripting', 'https://doc.nuxeo.com/nxdoc/understand-expression-and-scripting-languages-used-in-nuxeo/');
