@@ -345,8 +345,11 @@ a.reindex-page {
     color: #1F28BF;
     padding: 8px 16px;
     text-decoration: none;
-    display: block;
     font-weight: 500;
+}
+
+#dropdown-content a.always-show {
+    display: block;
 }
 
 #dropdown-content a:hover {
