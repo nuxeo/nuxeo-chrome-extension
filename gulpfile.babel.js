@@ -16,9 +16,18 @@ import cheerio from 'gulp-cheerio';
 import filter from 'gulp-filter';
 import debug from 'gulp-debug';
 import eslint from 'gulp-eslint';
+import minimist from 'minimist';
 
+const knownOptions = {
+  string: 'env',
+  default: { env: process.env.NODE_ENV || 'test' }
+};
+const options = minimist(process.argv.slice(2), knownOptions);
 const $ = gulpLoadPlugins();
+const test = options.env;
+
 let version = '';
+
 
 function pipe(src, transforms, dest) {
   if (typeof transforms === 'string') {
@@ -118,8 +127,8 @@ function prependScript(node, file) {
 gulp.task('lint', lint([
   'app/scripts.babel/*.js',
   'app/vendor.babel/**/*.js',
-  'test/features/step_definitions/*.js',
-  'test/features/step_definitions/support/**/*.js',
+  `${test}/features/step_definitions/*.js`,
+  `${test}/features/step_definitions/support/**/*.js`,
 ]));
 
 gulp.task('extras', () => {
@@ -230,7 +239,7 @@ gulp.task('build:sinon-chrome', ['build:chrome'], () => {
 
   // Transpile and Copy injecter.js script
   // gulp.src(path.join(__dirname, 'test', 'injecter.js'))
-  gulp.src(path.join('test', 'injecter.js'))
+  gulp.src(path.join(`${test}`, 'injecter.js'))
     .pipe($.babel({
       presets: ['es2015']
     }))

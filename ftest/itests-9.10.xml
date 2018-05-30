@@ -9,7 +9,7 @@
   </unzip>
   <import file="${out.dir}/nuxeo-ftest.xml" />
 
-  <property name="mp.install" value="file:${out.dir}/nuxeo-marketplace-jsf-ui.zip" />
+  <property name="mp.install" value="file:${out.dir}/nuxeo-web-ui-marketplace.zip" />
   <target name="prepare-environment" depends="_init,prepare-db,prepare-tomcat">
     <antcall target="set-conf">
       <param name="name" value="org.nuxeo.dev" />
@@ -17,8 +17,8 @@
     </antcall>
     <copy file="src/test/resources/cors-config.xml" todir="${nuxeo.nxserver}/config/" />
     <copy file="src/test/resources/instance.clid" todir="${nuxeo.nxserver}/data/" />
-    <copy tofile="${out.dir}/nuxeo-marketplace-jsf-ui.zip">
-      <artifact:file key="org.nuxeo.ecm.distribution:nuxeo-marketplace-jsf-ui::zip" />
+    <copy tofile="${out.dir}/nuxeo-web-ui-marketplace.zip">
+      <artifact:file key="org.nuxeo.web.ui:nuxeo-web-ui-marketplace::zip" />
     </copy>
   </target>
 

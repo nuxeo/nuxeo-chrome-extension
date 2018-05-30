@@ -2,7 +2,7 @@ module.exports = {
   // - - - - CHIMP - - - -
   showXolvioMessages: false,
   // - - - - CUCUMBER - - - -
-  path: 'test/features',
+  path: 'test_810/features',
   chai: true,
   // - - - - WEBDRIVER-IO  - - - -
   webdriverio: {
@@ -17,9 +17,6 @@ module.exports = {
       chromeOptions: {
         args: ['--no-sandbox']
       }
-    },
-    plugins: {
-    'wdio-webcomponents': {}
     }
   },
 };

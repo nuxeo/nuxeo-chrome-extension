@@ -2,7 +2,7 @@ module.exports = {
   // - - - - CHIMP - - - -
   showXolvioMessages: false,
   // - - - - CUCUMBER - - - -
-  path: 'test/features',
+  path: 'test_910/features',
   chai: true,
   screenshotsOnError: true,
   screenshotsPath: 'ftest/target/screenshots',

@@ -23,8 +23,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo.ecm.distribution</groupId>
-      <artifactId>nuxeo-marketplace-jsf-ui</artifactId>
+      <groupId>org.nuxeo.web.ui</groupId>
+      <artifactId>nuxeo-web-ui-marketplace</artifactId>
       <version>${nuxeo.tested.version}</version>
       <type>zip</type>
       <scope>test</scope>

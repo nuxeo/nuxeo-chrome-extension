@@ -2,7 +2,7 @@ module.exports = {
   // - - - - CHIMP - - - -
   showXolvioMessages: false,
   // - - - - CUCUMBER - - - -
-  path: 'test/features',
+  path: 'test_810/features',
   chai: true,
   screenshotsOnError: true,
   screenshotsPath: 'ftest/target/screenshots',
@@ -14,10 +14,7 @@ module.exports = {
     baseUrl: 'http://localhost:8080/nuxeo/',
     waitforTimeout: 30000,
     waitforInterval: 250,
-    logOutput: 'ftest/target/wdio',
-    plugins: {
-    'wdio-webcomponents': {}
-    }
+    logOutput: 'ftest/target/wdio'
   },
   desiredCapabilities: {
     browserName : 'chrome',

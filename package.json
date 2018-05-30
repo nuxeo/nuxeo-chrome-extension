@@ -44,6 +44,7 @@
     "path": "^0.12.7",
     "run-sequence": "^1.1.5",
     "sinon-chrome": "^2.3.1",
+    "wdio-webcomponents": "^1.1.0",
     "wiredep": "^4.0.0"
   },
   "eslintConfig": {
@@ -66,11 +67,17 @@
   "scripts": {
     "build": "gulp build",
     "qa": "gulp clean build:sinon-chrome package && chimp test/chimp-ci.conf.js",
+    "qa910": "gulp clean build:sinon-chrome package --env test_910 && chimp test_910/chimp-ci.conf.js",
+    "qa810": "gulp clean build:sinon-chrome package --env test_810 && chimp test_810/chimp-ci.conf.js",
     "pretest": "gulp clean build",
     "gulp": "gulp",
     "watch": "gulp watch",
     "test": "chimp test/chimp.conf.js",
-    "test-watch": "chimp test/chimp.conf.js --watch"
+    "test-watch": "chimp test/chimp.conf.js --watch",
+    "test910": "chimp test_910/chimp.conf.js",
+    "test-watch910": "chimp test_910/chimp.conf.js --watch",
+    "test810": "chimp test_810/chimp.conf.js",
+    "test-watch810": "chimp test_810/chimp.conf.js --watch"
   },
   "dependencies": {
     "nuxeo": "3.2.1"

@@ -23,9 +23,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo.ecm.distribution</groupId>
-      <artifactId>nuxeo-marketplace-jsf-ui</artifactId>
-      <version>${nuxeo.tested.version}</version>
+      <groupId>org.nuxeo.web.ui</groupId>
+      <artifactId>nuxeo-web-ui-marketplace</artifactId>
+      <version>2.2.0</version>
       <type>zip</type>
       <scope>test</scope>
     </dependency>
@@ -130,7 +130,7 @@
             </goals>
             <phase>integration-test</phase>
             <configuration>
-              <arguments>run qa</arguments>
+              <arguments>run qa910</arguments>
             </configuration>
           </execution>
         </executions>

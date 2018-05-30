@@ -12,7 +12,7 @@ Feature: Hot Reload & Studio Project
     And I have a Workspace document in Nuxeo
     And I see the Hot Reload button
 
-    When I go to the Home - Nuxeo Platform page
+    When I go to the Nuxeo Platform - Domain page
     And I navigate to the document
     And I try to create a document
     Then I can't see the Custom document type
