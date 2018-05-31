@@ -34,15 +34,23 @@ module.exports = function () {
       if (browser.shadowDomElement(['html body nuxeo-app',
         'nuxeo-document-create-popup', '#createDocDialog #holder iron-pages #simpleCreation',
         `iron-pages .vertical .container paper-dialog-scrollable paper-button[name="${docType}"]`]).value === null) {
+        const tabIds = browser.getTabIds();
+        return browser.switchTab(tabIds[0]);
         return true;
       } else {
+        const tabIds = browser.getTabIds();
+        return browser.switchTab(tabIds[0]);
         return false;
       }
     } else if (browser.shadowDomElement(['html body nuxeo-app',
       'nuxeo-document-create-popup', '#createDocDialog #holder iron-pages #simpleCreation',
       `iron-pages .vertical .container paper-dialog-scrollable paper-button[name="${docType}"]`]).value !== null) {
+      const tabIds = browser.getTabIds();
+      return browser.switchTab(tabIds[0]);
       return true;
     } else {
+      const tabIds = browser.getTabIds();
+      return browser.switchTab(tabIds[0]);
       return false;
     }
   });
