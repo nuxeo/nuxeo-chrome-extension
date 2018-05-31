@@ -50,9 +50,11 @@ module.exports = function () {
      * Browsers which do not have native ShadowDOM support assume each selector is a direct
      * descendant of the parent.
      */
-    browser.addCommand('shadowDomElement', function (selector) {
-      return this.execute(findInShadowDom, selector);
-    });
+    try {
+      browser.addCommand('shadowDomElement', function (selector) {
+        return this.execute(findInShadowDom, selector);
+      });
+    } catch(e){};
 
     /**
      * Provides the equivalent functionality as the above shadowDomElement command, but
@@ -63,11 +65,13 @@ module.exports = function () {
      *
      *     const elem = browser.waitForShadowDomElement(['foo-bar', 'bar-baz', 'baz-foo'], 2000);
      */
-    browser.addCommand('waitForShadowDomElement', function async(selector, timeout, timeoutMsg, interval) {
-      return this.waitUntil(() => {
-        const elem = this.execute(findInShadowDom, selector);
-        return elem && elem.value;
-      }, timeout, timeoutMsg, interval);
-    });
+    try {
+      browser.addCommand('waitForShadowDomElement', function async(selector, timeout, timeoutMsg, interval) {
+        return this.waitUntil(() => {
+          const elem = this.execute(findInShadowDom, selector);
+          return elem && elem.value;
+        }, timeout, timeoutMsg, interval);
+      });
+    } catch(e){};
   });
 };
