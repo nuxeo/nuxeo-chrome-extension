@@ -1,22 +1,19 @@
-// generated on 2016-03-11 using generator-chrome-extension 0.5.4
+import cheerio from 'gulp-cheerio';
+import concat from 'gulp-concat';
+import del from 'del';
+import eslint from 'gulp-eslint';
+import filter from 'gulp-filter';
+import fs from 'fs';
 import gulp from 'gulp';
 import gulpLoadPlugins from 'gulp-load-plugins';
-import del from 'del';
-import runSequence from 'run-sequence';
-import {
-  stream as wiredep
-} from 'wiredep';
-import es from 'event-stream';
-import fs from 'fs';
-import concat from 'gulp-concat';
-import path from 'path';
-import util from 'gulp-util';
-import moment from 'moment';
-import cheerio from 'gulp-cheerio';
-import filter from 'gulp-filter';
-import debug from 'gulp-debug';
-import eslint from 'gulp-eslint';
+import ls from 'list-directory-contents';
 import minimist from 'minimist';
+import moment from 'moment';
+import ms from 'merge-stream';
+import path from 'path';
+import runSequence from 'run-sequence';
+import { stream as wiredep } from 'wiredep';
+import util from 'gulp-util';
 
 const knownOptions = {
   string: 'env',
@@ -28,76 +25,50 @@ const test = options.env;
 
 let version = '';
 
-
-function pipe(src, transforms, dest) {
-  if (typeof transforms === 'string') {
-    dest = transforms;
-    transforms = null;
-  }
-
-  var stream = gulp.src(src);
-  transforms && transforms.forEach(function (transform) {
-    stream = stream.pipe(transform);
-  });
-
-  if (dest) {
-    stream = stream.pipe(gulp.dest(dest));
-  }
-
-  return stream;
-}
-
-// Create WIP build bersion based on date and time
-let buildNumber = (() => {
+// Create WIP build version based on date and time
+function buildNumber() {
   // Ensure build number is the same if FF and Chrome are built together.
-  let build = moment.utc().format('DDMM.HHmm');
-  return function () {
-    return build;
-  }
-})();
+  return moment.utc().format('DDMM.HHmm');
+}
 
 // Get version from manifest
 function readVersion(vendor) {
-  let manifest = require(`./app/vendor/${vendor}/manifest.json`);
+  let manifest = require(`./app/vendor/${ vendor }/manifest.json`);
   return manifest.version.split('\.');
 }
 
 // Increment build version
-let buildVersion = function (vendor) {
+function buildVersion(vendor) {
   let [major, minor, build] = readVersion(vendor);
-  return `${major}.${minor}.${buildNumber()}`
+  return `${ major }.${ minor }.${ buildNumber() }`;
 }
 
 // Increment minor version
-let minorVersion = function (vendor) {
+function minorVersion(vendor) {
   let [major, minor, build] = readVersion(vendor);
-  return `${major}.${parseInt(minor) + 1}.0`;
+  return `${ major }.${ parseInt(minor) + 1 }.0`;
 }
 
 // Increment major version
-let majorVersion = function (vendor) {
+function majorVersion(vendor) {
   let [major, minor, build] = readVersion(vendor);
-  return `${parseInt(major) + 1}.0.0`;
+  return `${ parseInt(major) + 1 }.0.0`;
 }
 
 function updateVersionForRelease(vendor, version, distFile) {
 
-  util.log(`Releasing ${vendor} Extension: ${version}`);
+  util.log(`Releasing ${ vendor } Extension: ${ version }`);
   // Update sources Manifest
-  gulp.src(`app/vendor/${vendor}/manifest.json`)
-    .pipe($.chromeManifest({
-      buildnumber: version
-    }))
-    .pipe(gulp.dest(`app/vendor/${vendor}`));
+  gulp.src(`app/vendor/${ vendor }/manifest.json`).pipe($.chromeManifest({
+    buildnumber: version
+  })).pipe(gulp.dest(`app/vendor/${ vendor }`));
 
-  gulp.src(`dist/${vendor}/manifest.json`)
-    .pipe($.chromeManifest({
-      buildnumber: version,
-      background: {
-        target: 'scripts/background.js'
-      }
-    }))
-    .pipe(gulp.dest(dist(vendor)));
+  return gulp.src(`dist/${ vendor }/manifest.json`).pipe($.chromeManifest({
+    buildnumber: version,
+    background: {
+      target: 'scripts/background.js'
+    }
+  }));
 }
 
 function lint(files) {
@@ -116,23 +87,19 @@ function lint(files) {
   }
 }
 
-function dist(vendor, name) {
-  return path.join('dist', vendor || 'base', name || '');
-}
-
 function prependScript(node, file) {
-  node.prepend(`<script src="${file}"></script>`);
+  node.prepend(`<script src="${ file }"></script>`);
 }
 
 function appendScript(node, file) {
-  node.append(`<script src="${file}"></script>`);
+  node.append(`<script src="${ file }"></script>`);
 }
 
 gulp.task('lint', lint([
   'app/scripts.babel/*.js',
   'app/vendor.babel/**/*.js',
-  `${test}/features/step_definitions/*.js`,
-  `${test}/features/step_definitions/support/**/*.js`,
+  'test*/features/step_definitions/*.js',
+  'test*/features/step_definitions/support/**/*.js'
 ]));
 
 gulp.task('extras', () => {
@@ -144,280 +111,305 @@ gulp.task('extras', () => {
     '!app/vendor.babel',
     '!app/scripts.babel',
     '!app/*.json',
-    '!app/*.html',
+    '!app/*.html'
   ], {
     base: 'app',
     dot: true
-  }).pipe(gulp.dest(dist()));
+  }).pipe(gulp.dest('dist/base'));
 });
 
 gulp.task('scripts', () => {
-  return gulp.src('app/scripts.babel/*.js')
-    .pipe(gulp.dest(dist('base/scripts')));
+  return gulp.src('app/scripts.babel/*.js').pipe(gulp.dest('dist/base/scripts'));
 });
 
 gulp.task('styles', () => {
-  return gulp.src('app/styles/*.css')
-    .pipe(gulp.dest(dist('base/styles')));
+  return gulp.src('app/styles/*.css').pipe(gulp.dest('dist/base/styles'));
 });
 
 gulp.task('images', () => {
-  return gulp.src('app/images/**/*')
-    .pipe($.if($.if.isFile, $.cache($.imagemin({
-        progressive: true,
-        interlaced: true,
-        // don't remove IDs from SVGs, they are often used
-        // as hooks for embedding and styling
-        svgoPlugins: [{
-          cleanupIDs: false
-        }]
-      }))
-      .on('error', function (err) {
-        console.log(err);
-        this.end();
-      })))
-    .pipe(gulp.dest(dist('base', 'images')));
-});
-
-gulp.task('vendor:chrome', ['babel'], () => {
-  return es.merge(
-    pipe('app/vendor/chrome/browser.js', dist('chrome', 'scripts'))
-  );
-});
-
-gulp.task('vendor:firefox', ['babel'], () => {
-  return es.merge(
-    pipe('app/vendor/firefox/browser.js', dist('firefox', 'scripts'))
-  );
-});
-
-gulp.task('html', ['vendor:chrome', 'vendor:firefox'], () => {
-  return gulp.src('app/*.html')
-    .pipe(gulp.dest(dist()));
-});
-
-gulp.task('build:chrome', ['build:base'], (done) => {
-  if (version.length < 1) {
-    version = buildVersion('chrome');
-  }
-  gulp.src(dist('base', '**/*'))
-    .pipe(filter(['**', '!**/about.html']))
-    .pipe(filter(['**', '!**/json.html']))
-    .pipe(gulp.dest(dist('chrome')));
-
-  gulp.src(dist('base', 'about.html'))
-    .pipe(cheerio(($) => {
-      const date = new Date().getFullYear();
-      $('#copyright').append(`${date} Nuxeo`);
-      $('#version').text(`Version ${version}`);
-    }))
-    .pipe(gulp.dest(dist('chrome')));
-
-  gulp.src(dist('base', 'json.html'))
-    .pipe(cheerio(($) => {
-      const $body = $('body');
-      appendScript($body, 'libs/highlight.js');
-    }))
-    .pipe(gulp.dest(dist('chrome')));
-
-  gulp.src('app/libs/highlight.js').pipe(gulp.dest(dist('chrome/libs')));
-
-  util.log(`Building Chrome Extension: ${version}`);
-
-  gulp.src('app/vendor/chrome/manifest.json')
-    .pipe($.chromeManifest({
-      buildnumber: version,
-      background: {
-        target: 'scripts/background.js'
-      }
-    }))
-    .pipe(gulp.dest(dist('chrome')));
-
-  return runSequence('size', done);
-});
-
-gulp.task('build:sinon-chrome', ['build:chrome'], () => {
-  if (version.length < 1) {
-    version = buildVersion('sinon-chrome');
-  }
-  const target = 'sinon-chrome';
-  // Copy Chrome build
-  gulp.src(dist('chrome', '**/*'))
-    .pipe(filter(['**', '!**/popup.html']))
-    .pipe(filter(['**', '!**/about.html']))
-    .pipe(filter(['**', '!**/es-reindex.html']))
-    .pipe(gulp.dest(dist(target)));
-
-  gulp.src(dist('base', 'json.html'))
-    .pipe(cheerio(($) => {
-      const $body = $('body');
-      appendScript($body, 'libs/highlight.js');
-    }))
-    .pipe(gulp.dest(dist('chrome')));
-
-  gulp.src('app/libs/highlight.js').pipe(gulp.dest(dist('chrome/libs')));
-
-  // Add sinon-chrome.min script
-  gulp.src(require.resolve('sinon-chrome/bundle/sinon-chrome.min.js'))
-    .pipe(gulp.dest(dist(target, 'scripts')))
-
-  // Transpile and Copy injecter.js script
-  // gulp.src(path.join(__dirname, 'test', 'injecter.js'))
-  gulp.src(path.join(`${test}`, 'injecter.js'))
-    .pipe($.babel({
-      presets: ['es2015']
-    }))
-    .pipe(gulp.dest(dist(target, 'scripts')));
-
-  // Create a standalone index.html with background.js, sinon-chrome and a script injecter to manipulate mocks from Webdriverio.
-  gulp.src(dist('chrome', 'popup.html'))
-    .pipe(cheerio(($) => {
-      const $head = $('head');
-      // !! Order matters; as we use `prepend`, last added will be first.
-      prependScript($head, 'scripts/background.js');
-      prependScript($head, 'scripts/injecter.js');
-      prependScript($head, 'scripts/sinon-chrome.min.js');
-    }))
-    .pipe(gulp.dest(dist(target)));
-
-  gulp.src(dist('chrome', 'about.html'))
-    .pipe(cheerio(($) => {
-      const $head = $('head');
-      // !! Order matters; as we use `prepend`, last added will be first.
-      prependScript($head, 'scripts/background.js');
-      prependScript($head, 'scripts/injecter.js');
-      prependScript($head, 'scripts/sinon-chrome.min.js');
-      const date = new Date().getFullYear();
-      $('#version').text(`Version ${version}`);
-    }))
-    .pipe(gulp.dest(dist(target)));
-
-  gulp.src(dist('chrome', 'es-reindex.html'))
-    .pipe(cheerio(($) => {
-      const $head = $('head');
-      // !! Order matters; as we use `prepend`, last added will be first.
-      prependScript($head, 'scripts/background.js');
-      prependScript($head, 'scripts/injecter.js')
-      prependScript($head, 'scripts/sinon-chrome.min.js');
-    }))
-    .pipe(gulp.dest(dist(target)));
-});
-
-gulp.task('build:firefox', ['build:base', 'vendor:firefox'], (done) => {
-  if (version.length < 1) {
-    version = buildVersion('firefox');
-  }
-  gulp.src(dist('base', '**/*'))
-    .pipe(filter(['**', '!**/about.html']))
-    .pipe(gulp.dest(dist('firefox')));
-
-  gulp.src(dist('base', 'about.html'))
-    .pipe(cheerio(($) => {
-      const date = new Date().getFullYear();
-      $('#copyright').append(`${date} Nuxeo`);
-      $('#version').text(`Version ${version}`);
-    }))
-    .pipe(gulp.dest(dist('firefox')));
-
-  util.log(`Building Firefox Extension: ${version}`);
-
-  gulp.src('app/vendor/firefox/manifest.json')
-    .pipe($.chromeManifest({
-      buildnumber: version,
-      background: {
-        target: 'scripts/background.js'
-      }
-    }))
-    .pipe(gulp.dest(dist('firefox')));
-
-  return runSequence('size', done);
-});
-
-gulp.task('release:chrome', ['build:chrome'], (cb) => {
-  updateVersionForRelease('chrome', version);
-  return runSequence('zip:chrome', cb);
-});
-
-gulp.task('release:firefox', ['build:firefox'], (cb) => {
-  updateVersionForRelease('firefox');
-  return runSequence('zip:firefox', cb);
-});
-
-gulp.task('babel', ['lint'], (cb) => {
-  return runSequence('babel:base', 'babel:vendor', cb);
+  return gulp.src('app/images/*').pipe(gulp.dest('dist/base/images'));
 });
 
 gulp.task('babel:bkg', () => {
-  return gulp.src('app/scripts.babel/bkg/*.js')
-  .pipe(concat('bkg.js'))
-  .pipe($.babel({
-    presets: ['es2015']
-  }))
-  .pipe(gulp.dest('app/scripts'));
+  return gulp.src('app/scripts.babel/bkg/*.js').pipe(concat('bkg.js')).pipe($.babel({
+    presets: ['@babel/env']
+  })).pipe(gulp.dest('app/scripts'));
 });
 
-gulp.task('babel:base', ['babel:bkg'], () => {
-  return gulp.src('app/scripts.babel/*.js')
-    .pipe($.babel({
-      presets: ['es2015']
-    }))
-    .pipe(gulp.dest('app/scripts'));
-});
-
-gulp.task('babel:vendor', ['babel:vendor:chrome', 'babel:vendor:firefox', 'manifest']);
-
-gulp.task('babel:vendor:firefox', () => {
-  return gulp.src('app/vendor.babel/firefox/*.js')
-    .pipe($.babel({
-      presets: ['es2015']
-    })).pipe(gulp.dest('app/vendor/firefox'));
+gulp.task('babel:base', gulp.series('babel:bkg'), () => {
+  return gulp.src('app/scripts.babel/*.js').pipe($.babel({
+    presets: ['@babel/env']
+  })).pipe(gulp.dest('app/scripts'));
 });
 
 gulp.task('babel:vendor:chrome', () => {
-  return gulp.src('app/vendor.babel/chrome/*.js')
-    .pipe($.babel({
-      presets: ['es2015']
-    })).pipe(gulp.dest('app/vendor/chrome'));
+  return gulp.src('app/vendor.babel/chrome/*.js').pipe($.babel({
+    presets: ['@babel/env']
+  })).pipe(gulp.dest('app/vendor/chrome'));
 });
 
-gulp.task('manifest', ['manifest:firefox', 'manifest:chrome']);
+gulp.task('babel:vendor:firefox', () => {
+  return gulp.src('app/vendor.babel/firefox/*.js').pipe($.babel({
+    presets: ['@babel/env']
+  })).pipe(gulp.dest('app/vendor/firefox'));
+});
 
 gulp.task('manifest:firefox', () => {
-  return gulp.src('app/vendor.babel/firefox/manifest.json')
-    .pipe(gulp.dest('app/vendor/firefox'));
+  return gulp.src('app/vendor.babel/firefox/manifest.json').pipe(gulp.dest('app/vendor/firefox'));
 });
 
 gulp.task('manifest:chrome', () => {
-  return gulp.src('app/vendor.babel/chrome/manifest.json')
-    .pipe(gulp.dest('app/vendor/chrome'))
+  return gulp.src('app/vendor.babel/chrome/manifest.json').pipe(gulp.dest('app/vendor/chrome'));
 });
+
+gulp.task('manifest', gulp.parallel('manifest:firefox', 'manifest:chrome'));
+
+gulp.task('babel:vendor', gulp.parallel('babel:vendor:chrome', 'babel:vendor:firefox', 'manifest'));
+
+gulp.task('babel', gulp.series('lint', gulp.parallel('babel:base', 'babel:vendor')));
+
+gulp.task('vendor:chrome', () => {
+  return gulp.src('app/vendor/chrome/browser.js').pipe(gulp.dest('dist/chrome/scripts'));
+});
+
+gulp.task('vendor:firefox', () => {
+  return gulp.src('app/vendor/firefox/browser.js').pipe(gulp.dest('dist/firefox/scripts'));
+});
+
+gulp.task('html', () => {
+  return gulp.src('app/*.html').pipe(gulp.dest('dist/base'));
+});
+
+gulp.task('build:base',
+  gulp.series(
+    'babel',
+    gulp.parallel(
+      'vendor:chrome',
+      'vendor:firefox'
+    ),
+    gulp.parallel(
+      'images',
+      'extras',
+      'scripts',
+      'styles',
+      'html'
+    )
+  )
+);
+
+gulp.task('build:chrome:version', (done) => {
+  version = buildVersion('chrome');
+  done();
+});
+
+gulp.task('build:chrome:base', () => {
+  util.log(`Building Chrome Extension: ${ version }`);
+  return gulp.src('dist/base/**/*')
+    .pipe(filter(['**', '!**/about.html']))
+    .pipe(filter(['**', '!**/json.html']))
+    .pipe(gulp.dest('dist/chrome'));
+});
+
+gulp.task('build:chrome:about', () => {
+  return gulp.src('dist/base/about.html').pipe(cheerio($ => {
+    const date = new Date().getFullYear();
+    $('#copyright').append(`${ date } Nuxeo`);
+    $('#version').text(`Version ${ version }`);
+  })).pipe(gulp.dest('dist/chrome'));
+});
+
+gulp.task('build:chrome:json', () => {
+  return gulp.src('dist/base/json.html').pipe(cheerio($ => {
+    const $body = $('body');
+    appendScript($body, 'libs/highlight.js');
+  })).pipe(gulp.dest('dist/chrome'));
+});
+
+gulp.task('build:chrome:highlight', () => {
+  return gulp.src('app/libs/highlight.js').pipe(gulp.dest('dist/chrome/libs'));
+});
+
+// gulp-chrome-manifest messes up base directory
+gulp.task('build:chrome:manifest', () => {
+  return gulp.src('app/vendor/chrome/manifest.json').pipe($.chromeManifest({
+    buildnumber: version,
+    background: {
+      target: 'scripts/background.js'
+    }
+  })).pipe(gulp.dest('../../../dist/chrome'));
+});
+
+gulp.task('build:chrome', gulp.series(
+  'build:chrome:version',
+  'build:chrome:base',
+  'build:chrome:about',
+  'build:chrome:json',
+  'build:chrome:highlight',
+  'build:chrome:manifest'
+));
+
+gulp.task('build:sinon-chrome:version', (done) => {
+  version = buildVersion('chrome');
+  done();
+});
+
+gulp.task('build:sinon-chrome:base', () => {
+  // Copy Chrome build
+  return gulp.src('dist/chrome/**/*')
+    .pipe(filter(['**', '!**/popup.html']))
+    .pipe(filter(['**', '!**/about.html']))
+    .pipe(filter(['**', '!**/es-reindex.html']))
+    .pipe(gulp.dest('dist/sinon-chrome'));
+});
+
+// Add sinon-chrome.min script
+gulp.task('build:sinon-chrome:min', () => {
+  return gulp.src(require.resolve('sinon-chrome/bundle/sinon-chrome.min.js'))
+    .pipe(gulp.dest('dist/sinon-chrome/scripts'));
+});
+
+// Transpile and copy injecter.js script
+gulp.task('build:sinon-chrome:injector', () => {
+  return gulp.src(path.join(`${ test }`, 'injecter.js')).pipe($.babel({
+    presets: ['@babel/env']
+  })).pipe(gulp.dest('dist/sinon-chrome/scripts'));
+});
+
+// Create a standalone index.html with background.js, sinon-chrome and a script injecter to manipulate mocks from Webdriverio.
+gulp.task('build:sinon-chrome:index', () => {
+  return gulp.src('dist/chrome/popup.html').pipe(cheerio($ => {
+    const $head = $('head');
+    // Order matters; as we use `prepend`, last added will be first.
+    prependScript($head, 'scripts/background.js');
+    prependScript($head, 'scripts/injecter.js');
+    prependScript($head, 'scripts/sinon-chrome.min.js');
+  })).pipe(gulp.dest('dist/sinon-chrome'));
+});
+
+gulp.task('build:sinon-chrome:about', () => {
+  return gulp.src('dist/chrome/about.html').pipe(cheerio($ => {
+      const $head = $('head');
+      // Order matters; as we use `prepend`, last added will be first.
+      prependScript($head, 'scripts/background.js');
+      prependScript($head, 'scripts/injecter.js');
+      prependScript($head, 'scripts/sinon-chrome.min.js');
+      const date = new Date().getFullYear();
+      $('#version').text(`Version ${ version }`);
+    })).pipe(gulp.dest('dist/sinon-chrome'));
+});
+
+gulp.task('build:sinon-chrome:es-reindex', () => {
+  return gulp.src('dist/chrome/es-reindex.html').pipe(cheerio($ => {
+    const $head = $('head');
+    // !! Order matters; as we use `prepend`, last added will be first.
+    prependScript($head, 'scripts/background.js');
+    prependScript($head, 'scripts/injecter.js');
+    prependScript($head, 'scripts/sinon-chrome.min.js');
+  })).pipe(gulp.dest('dist/sinon-chrome'));
+});
+
+gulp.task('build:sinon-chrome', gulp.series(
+  'build:sinon-chrome:version',
+  'build:sinon-chrome:base',
+  'build:sinon-chrome:min',
+  'build:sinon-chrome:injector',
+  'build:sinon-chrome:index',
+  'build:sinon-chrome:about',
+  'build:sinon-chrome:es-reindex'
+));
+
+// Build ONLY sinon-chrome for testing purposes
+gulp.task('sinon-chrome', gulp.series(
+  'build:base',
+  'build:chrome',
+  'build:sinon-chrome'
+));
+
+gulp.task('build:firefox:version', (done) => {
+  version = buildVersion('firefox');
+  done();
+});
+
+gulp.task('build:firefox:base', () => {
+  if (version.length < 1) {
+    version = buildVersion('firefox');
+  }
+  util.log(`Building Firefox Extension: ${ version }`);
+  return gulp.src('dist/base/**/*')
+    .pipe(filter(['**', '!**/about.html']))
+    .pipe(gulp.dest('dist/firefox'));
+});
+
+gulp.task('build:firefox:about', () => {
+  return gulp.src('dist/base/about.html').pipe(cheerio($ => {
+    const date = new Date().getFullYear();
+    $('#copyright').append(`${ date } Nuxeo`);
+    $('#version').text(`Version ${ version }`);
+  })).pipe(gulp.dest('dist/firefox'));
+});
+
+// gulp-chrome-manifest messes up base directory
+gulp.task('build:firefox:manifest', () => {
+  return gulp.src('app/vendor/firefox/manifest.json').pipe($.chromeManifest({
+    buildnumber: version,
+    background: {
+      target: 'scripts/background.js'
+    }
+  })).pipe(gulp.dest('../../../dist/firefox'));
+});
+
+gulp.task('build:firefox', gulp.series(
+  'build:firefox:version',
+  'build:firefox:base',
+  'build:firefox:about',
+  'build:firefox:manifest'
+));
+
+gulp.task('version:chrome', () => {
+  return updateVersionForRelease('chrome', version);
+});
+
+gulp.task('version:firefox', () => {
+  return updateVersionForRelease('firefox');
+});
+
+gulp.task('zip:chrome', () => {
+  let filename = `BrowserDeveloperExtension-Chrome-${ version }.zip`;
+  util.log(`Building file: ${ filename }`);
+  return gulp.src('dist/chrome/**').pipe($.zip(filename)).pipe(gulp.dest('package/chrome'));
+});
+
+gulp.task('zip:firefox', () => {
+  let filename = `BrowserDeveloperExtension-Firefox-${ version }.zip`;
+  util.log(`Building file: ${ filename }`);
+  return gulp.src('dist/firefox/**').pipe($.zip(filename)).pipe(gulp.dest('package/firefox'));
+});
+
+gulp.task('release:chrome',
+  gulp.series(
+    'build:chrome',
+    'version:chrome',
+    'zip:chrome'
+  )
+);
+
+gulp.task('release:firefox',
+  gulp.series(
+    'build:firefox',
+    'version:firefox',
+    'zip:firefox'
+  )
+);
 
 gulp.task('clean', () => {
-  return del.sync(['.tmp', 'dist', 'package', 'app/scripts', 'app/vendor']);
-});
-
-gulp.task('watch', ['build'], () => {
-  $.livereload.listen();
-
-  gulp.watch('app/scripts.babel/*.js', ['html']);
-  gulp.watch('app/vendor.babel/**/*.js', ['vendor:chrome', 'vendor:firefox']);
-  gulp.watch([
-    'app/*.html',
-    'app/libs/**/*.js',
-    'app/images/**/*',
-    'app/styles/**/*',
-    'app/_locales/**/*.json'
-  ]).on('change', function () {
-    gulp.start('build:chrome');
-    $.livereload.reload;
-  });
-  gulp.watch([
-    'app/scripts/**/*.js',
-    'app/vendor/**/*'
-  ]).on('change', function () {
-    $.livereload.reload;
-  });
-  gulp.watch('bower.json', ['wiredep']);
+  return del([
+    '.tmp',
+    'dist',
+    'package',
+    'app/scripts',
+    'app/vendor',
+    'test*/screenshots'
+  ]);
 });
 
 gulp.task('size', () => {
@@ -427,55 +419,59 @@ gulp.task('size', () => {
   }));
 });
 
-gulp.task('wiredep', () => {
-  gulp.src('app/*.html')
-    .pipe(wiredep({
-      ignorePath: /^(\.\.\/)*\.\./
-    }))
-    .pipe(gulp.dest('app/chrome'))
-    .pipe(gulp.dest('app/firefox'));
+// build:chrome is dependency of build:sinon-chrome
+gulp.task('build',
+  gulp.series(
+    'build:base',
+    gulp.parallel(
+      'build:firefox',
+      'build:chrome'
+    ),
+    'size',
+    'build:sinon-chrome'
+  )
+);
+
+gulp.task('watch:tasks', (done) => {
+  $.livereload.listen();
+  gulp.watch([
+    'app/*.html',
+    'app/libs/**/*.js',
+    'app/images/**/*',
+    'app/styles/**/*',
+    'app/_locales/**/*.json',
+    'app/vendor.babel/**/*.js',
+    'app/scripts.babel/*.js',
+    'app/scripts.babel/bkg/*.js'
+  ]).on('change', gulp.series('build:base', 'build:chrome'));
+  gulp.watch([
+    'dist/chrome/**/'
+  ]).on('change', function () {
+    $.livereload.reload;
+  });
+  done();
 });
 
-gulp.task('zip:chrome', () => {
-  let filename = `BrowserDeveloperExtension-Chrome-${version}.zip`;
-  util.log(`Building file: ${filename}`);
-  return gulp.src(dist('chrome', '**'))
-    .pipe($.zip(filename))
-    .pipe(gulp.dest('package/chrome'));
-});
+gulp.task('watch', gulp.series('build:base', 'build:chrome', 'watch:tasks'));
 
-gulp.task('zip:firefox', () => {
-  let filename = `BrowserDeveloperExtension-Firefox-${version}.zip`;
-  util.log(`Building file: ${filename}`);
-  return gulp.src(dist('firefox', '**'))
-    .pipe($.zip(filename))
-    .pipe(gulp.dest('package/firefox'));
-});
+gulp.task('package:chrome', gulp.series('build:chrome', 'zip:chrome'));
 
-gulp.task('package:chrome', (done) => {
-  return runSequence('build:chrome', 'zip:chrome', done);
-});
+gulp.task('package:firefox', gulp.series('build:firefox', 'zip:firefox'));
 
-gulp.task('package:firefox', (done) => {
-  return runSequence('build:firefox', 'zip:firefox', done);
-});
-
-gulp.task('base', () => {
-  gulp.src(dist('base', '**/*'))
-    .pipe(gulp.dest(dist('firefox')))
-    .pipe(gulp.dest(dist('chrome')));
-});
-
-gulp.task('build:base', ['images', 'extras', 'scripts', 'styles', 'html']);
-
-gulp.task('default', ['clean', 'build']);
-gulp.task('build', ['build:chrome', 'build:firefox', 'build:sinon-chrome']);
-gulp.task('package', ['package:chrome', 'package:firefox']);
-gulp.task('release', () => {
+gulp.task('version:minor', done => {
   version = minorVersion('chrome');
-  return runSequence(['release:chrome', 'release:firefox']);
+  done();
 });
-gulp.task('release:major', () => {
+
+gulp.task('version:major', done => {
   version = majorVersion('chrome');
-  return runSequence(['release:chrome', 'release:firefox']);
+  done();
 });
+
+gulp.task('default', gulp.series('clean', 'build'));
+
+gulp.task('package', gulp.series('build:base', gulp.parallel('package:chrome', 'package:firefox')));
+
+gulp.task('release', gulp.series('build:base', gulp.parallel('build:chrome', 'build:firefox'), 'version:minor', 'version:chrome', gulp.parallel('zip:chrome', 'zip:firefox')));
+
+gulp.task('release:major', gulp.series('build:base', gulp.parallel('build:chrome', 'build:firefox'), 'version:major', 'version:chrome', gulp.parallel('zip:chrome', 'zip:firefox')));

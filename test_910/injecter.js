@@ -12,7 +12,7 @@ window.app = {
   auth: {
     method: 'basic',
     username: 'Administrator',
-    password: 'Administrator'
+    password: 'Administrator',
   }
 };
 

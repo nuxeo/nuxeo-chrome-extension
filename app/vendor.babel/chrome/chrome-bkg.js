@@ -169,7 +169,8 @@ chrome.omnibox.onInputChanged.addListener(
           });
       }
     });
-  });
+  },
+);
 
 chrome.omnibox.onInputEntered.addListener(
   (text) => {
@@ -183,4 +184,5 @@ chrome.omnibox.onInputEntered.addListener(
         openDocFromPath(text, url);
       }
     });
-  });
+  },
+);

@@ -51,7 +51,7 @@ Then(/^I (can't )?see the (.+) document type/, (notVisible, docType) => {
 });
 
 Then(/^the Nuxeo page refreshes/, () => {
-  browser.waitUntil(() => browser.execute(() => chrome.tabs.reload.called).value, 40000);
+  browser.waitUntil(() => browser.execute(() => chrome.tabs.reload.called).value, 20000);
   const tabIds = browser.getTabIds();
   for (let i = 0; i < tabIds.length; i += 1) {
     if (browser.getTitle().indexOf('Nuxeo Platform') === -1) {

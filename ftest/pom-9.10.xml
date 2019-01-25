@@ -38,8 +38,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <nodeVersion>v8.9.4</nodeVersion>
-        <npmVersion>6.0.0</npmVersion>
+        <nodeVersion>v10.12.0</nodeVersion>
+        <npmVersion>6.7.0</npmVersion>
       </properties>
     </profile>
   </profiles>
@@ -124,13 +124,23 @@
             </goals>
           </execution>
           <execution>
+            <id>npm gulp</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <arguments>run build</arguments>
+            </configuration>
+          </execution>
+          <execution>
             <id>npm test</id>
             <goals>
               <goal>npm</goal>
             </goals>
             <phase>integration-test</phase>
             <configuration>
-              <arguments>run qa910</arguments>
+              <arguments>run test910</arguments>
             </configuration>
           </execution>
         </executions>

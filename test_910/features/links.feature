@@ -15,15 +15,15 @@ Feature: Links
       | MVEL               | Use of MVEL in Automation Chains \| Nuxeo Documentation                            |
       | Workflow Variables | Variables Available in the Automation Context \| Nuxeo Documentation               |
       | Escalation Rules   | Escalation Service \| Nuxeo Documentation                                          |
-      | Nuxeo Elements     | nuxeo                                                                              |
+      | Nuxeo Elements     | webcomponents.org - Discuss & share web components                                 |
       | Nuxeo Layouts      | Nuxeo Showcase - Layout Service (forms, views, and actions)                        |
       | Style Guide        | Nuxeo Platform - Style Guide                                                       |
       | Automation Doc     | Nuxeo Automation Documentation                                                     |
 
-#  Scenario: Studio button
-    # Given the Popup page is open
-    # And I have a valid Studio project
-    # When I click on the Studio button
+ # Scenario: Studio button
+ #    Given the Popup page is open
+ #    And I have a valid Studio project
+ #    When I click on the Studio button
 
   Scenario: API Playground link
     Given the Popup page is open

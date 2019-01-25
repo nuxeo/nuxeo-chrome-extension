@@ -3,15 +3,15 @@
   <parent>
     <groupId>org.nuxeo.ecm.distribution</groupId>
     <artifactId>nuxeo-distribution</artifactId>
-    <version>8.10</version>
+    <version>10.10</version>
     <relativePath></relativePath>
   </parent>
 
   <artifactId>nuxeo-browser-extension-ftest</artifactId>
-  <name>Functional Tests for Nuxeo Browser Extension on latest Nuxeo 8.10 HF</name>
+  <name>Functional Tests for Nuxeo Browser Extension on latest Nuxeo 10.10 HF</name>
 
   <properties>
-    <nuxeo.tested.version>[8.10]</nuxeo.tested.version>
+    <nuxeo.tested.version>[10.10]</nuxeo.tested.version>
   </properties>
 
   <dependencies>
@@ -23,9 +23,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo.ecm.distribution</groupId>
-      <artifactId>nuxeo-marketplace-jsf-ui</artifactId>
-      <version>${nuxeo.tested.version}</version>
+      <groupId>org.nuxeo.web.ui</groupId>
+      <artifactId>nuxeo-web-ui-marketplace</artifactId>
+      <version>2.4.0</version>
       <type>zip</type>
       <scope>test</scope>
     </dependency>
@@ -64,7 +64,7 @@
         <groupId>org.nuxeo.build</groupId>
         <artifactId>ant-assembly-maven-plugin</artifactId>
         <configuration>
-          <buildFile>${basedir}/itests-8.10.xml</buildFile>
+          <buildFile>${basedir}/itests-10.10.xml</buildFile>
         </configuration>
         <executions>
           <execution>
@@ -140,7 +140,7 @@
             </goals>
             <phase>integration-test</phase>
             <configuration>
-              <arguments>run test810</arguments>
+              <arguments>run test1010</arguments>
             </configuration>
           </execution>
         </executions>

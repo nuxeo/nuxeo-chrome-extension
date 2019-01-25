@@ -14,7 +14,7 @@ def formatSlack(begin) {
   return "${begin} <${currentBuild.absoluteUrl}|${env.JOB_NAME}>";
 }
 
-def archive_paths = 'ftest/target/tomcat/log/*.log, ftest/target/screenshots/*, ftest/target/wdio/*, ftest/target/cucumber-reports/*, package/*'
+def archive_paths = "ftest/target/tomcat/log/*.log, test_${env.NX_VERSION}/screenshots/*, package/*"
 
 node(env.SLAVE) {
     sh "echo ${env.SLAVE}"
@@ -23,21 +23,12 @@ node(env.SLAVE) {
             timeout(30) {
                 stage('checkout') {
                     // manually clean before checkout
-                    sh """
-                        if git rev-parse --git-dir > /dev/null 2>&1; then
-                            git clean -fdx
-                        fi
-                    """
+                    sh "rm -rf node_modules"
 
                     checkout scm
                 }
 
                 stage ('build and test') {
-                    step([$class: 'GitHubCommitStatusSetter',
-                        reposSource: [$class: 'ManuallyEnteredRepositorySource', url: 'https://github.com/nuxeo/nuxeo-browser-extension'],
-                        contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: "${env.STATUS_CONTEXT_NAME}"],
-                        statusResultSource: [$class: 'ConditionalStatusResultSource',
-                        results: [[$class: 'AnyBuildResult', message: 'Building on Nuxeo CI', state: 'PENDING']]]])
 
                     def jdk = tool name: 'java-8-oracle'
                     env.JAVA_HOME = "${jdk}"
@@ -51,7 +42,7 @@ node(env.SLAVE) {
                         consoleParsers: [[parserName: 'Maven']], defaultEncoding: '', excludePattern: '',
                         healthy: '', includePattern: '', messagesPattern: '', unHealthy: ''])
                     step([$class: 'CucumberReportPublisher', jsonReportDirectory: 'ftest/target/cucumber-reports/', fileIncludePattern: '*.json'])
-                    archive "${archive_paths}"
+                    archiveArtifacts "${archive_paths}"
                     // TODO cobertura coverage
                     if (env.BRANCH_NAME == 'master') {
                         step([$class: 'JiraIssueUpdater', issueSelector: [$class: 'DefaultIssueSelector'], scm: scm])
@@ -62,26 +53,16 @@ node(env.SLAVE) {
                             body: "Build back to normal: ${env.BUILD_URL}.")
                         slackSend color: '#5FB404', channel: "${env.SLACK_CHANNEL}", message: formatSlack(status) + ' - *Back to normal!* :sparkles:'
                     }
-                    step([$class: 'GitHubCommitStatusSetter',
-                        reposSource: [$class: 'ManuallyEnteredRepositorySource', url: 'https://github.com/nuxeo/nuxeo-browser-extension'],
-                        contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: "${env.STATUS_CONTEXT_NAME}"],
-                        statusResultSource: [$class: 'ConditionalStatusResultSource',
-                        results: [[$class: 'AnyBuildResult', message: 'Successfully built on Nuxeo CI', state: 'SUCCESS']]]])
                 }
             }
         }
     } catch(e) {
         currentBuild.result = "FAILURE"
         step([$class: 'ClaimPublisher'])
-        archive "${archive_paths}"
+        archiveArtifacts "${archive_paths}"
 
         mail (to: 'ecm@lists.nuxeo.com', subject: "${env.JOB_NAME} (${env.BUILD_NUMBER}) - Failure!",
             body: "Build failed ${env.BUILD_URL}.")
-        step([$class: 'GitHubCommitStatusSetter',
-            reposSource: [$class: 'ManuallyEnteredRepositorySource', url: 'https://github.com/nuxeo/nuxeo-browser-extension'],
-            contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: "${env.STATUS_CONTEXT_NAME}"],
-            statusResultSource: [$class: 'ConditionalStatusResultSource',
-            results: [[$class: 'AnyBuildResult', message: 'Failed to build on Nuxeo CI', state: 'FAILURE']]]])
         step([$class: 'CucumberReportPublisher', jsonReportDirectory: 'ftest/target/cucumber-reports/', fileIncludePattern: '*.json'])
         slackSend color: '#FF4000', channel: "${env.SLACK_CHANNEL}", message: formatSlack('FAILURE') + " ```${e.message}```"
         throw e

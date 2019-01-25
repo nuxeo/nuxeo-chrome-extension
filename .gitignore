@@ -3,10 +3,12 @@ temp
 .tmp
 dist
 .sass-cache
+.npmrc
 bower_components
 package
 app/scripts
 app/vendor
 npm-debug.log
 target
+test*/screenshots
 ftest/src/test/resources/instance.clid
