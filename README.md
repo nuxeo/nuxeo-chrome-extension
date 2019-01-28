@@ -7,26 +7,24 @@ Nuxeo Dev Tools
 
 # About
 
-This project puts some of the more commonly performed actions in the Nuxeo Platform at the administrator's fingertips in a convenient popup window.
+This project puts some of the more commonly performed actions in the Nuxeo Platform at the administrator's fingertips in a convenient browser extension.
 
 Features include:
-* Hot Reload on related Studio project
-* Link to Studio project
-* Link to Automation Documentation
-* Restart server
-* Rebuild Elasticsearch Index
-* Connect to API Playground
-* Toggle Automation Call Tracing
+* **Hot Reload** on related Studio project
+* **Restart** server
+* Rebuild **Elasticsearch** Index
+* Connect to **API Playground**
+* Toggle **Automation Call Tracing**
+* One-click **JSON export of document** in current active tab
 * Useful Links menu
-* Document Search (search with path, GUID, file name or NXQL query)
+* **Document Search** (search with path, GUID, file name or NXQL query)
   * Click on search results to navigate to document or on ![export](app/images/json-exp.png) to export JSON
-* One-click JSON export of document in current active tab
-* Chrome Omnibox
-  * Chrome users can access the Nuxeo omnibox by entering keyword `nx` in the URL box, then TAB.
+* **Chrome Omnibox**
+  * Chrome users can access the **Nuxeo omnibox** by entering keyword `nx` in the URL box, then TAB.
   * Entering the correct path or GUID of an existing document will open the document JSON in a separate tab.
   * Entering text will perform a full-text search or you can enter an NXQL query.
   * Searches return the first 5 results in a dropdown window from the omnibox.
-* Link to our Customer Feedback Portal from the About page. You can vote for requested features or even suggest your own, anonymously if you wish.
+* Link to our **Customer Feedback Portal** from the About page. You can vote for requested features or even suggest your own, anonymously if you wish.
 
 # Installation
 
@@ -36,26 +34,45 @@ Features include:
 ## Requirements
 
 * Nuxeo 8.2 +
+* Install any available **hotfixes**.
 
 ## Limitations
 
-* Multiple Nuxeo projects are not supported.
+* Multiple Studio projects are not supported.
 * The extension is only active when a Nuxeo instance is in the current active tab.
-* The Hot Reload and Go To Studio buttons are only active *when a Studio project is associated with the current Nuxeo server*.
-* You must also have Administrator access and have Dev Mode activated.
-* [CORS config](https://doc.nuxeo.com/pages/viewpage.action?pageId=14257084) must be activated in your Nuxeo server to connect to your repository on API Playground.
-* [Certain features in the Firefox addon](https://jira.nuxeo.com/browse/NXP-24828) won't work and will cause server errors with Nuxeo FT 10.1.
+* The **Hot Reload** and **Go To Studio** buttons are only active *when a Studio project is associated with the current Nuxeo server*.
+* You must have **Administrator** access for some features.
+* **Dev Mode** must be activated to benefit from the **Hot Reload** feature.
+* [**CORS config**](https://doc.nuxeo.com/pages/viewpage.action?pageId=14257084) must be activated in your Nuxeo server to connect to your repository on API Playground.
+* The extension does not work in **Incognito/Private** mode.
 
-## Build
+
+# Build
+
 
 ```
 $ git clone git@github.com:nuxeo/nuxeo-browser-extension.git
 $ cd nuxeo-browser-extension
 $ npm install
-$ gulp build:<browser>
-# or
-$ npm run build
+$ gulp clean build
 ```
+
+## Developers
+
+Run `gulp watch` and load the unpacked extension in your preferred browser for your changes to be reloaded immediately.
+
+### Firefox
+
+  * Enter about:debugging in the address bar.
+  * Click on **Load Temporary Add-on...**.
+  * Select nuxeo-browser-extension/dist/**firefox/manifest.json**.
+
+
+### Chrome
+
+  * *Options* > *More Tools* > *Extensions*
+  * Click on the **Load Unpacked** button.
+  * Select nuxeo-browser-extension/dist/**chrome**.
 
 ### Tests
 ```
@@ -63,15 +80,24 @@ $ npm install
 $ npm run test
 ```
 
-To run isolated test scenarios, add the `@watch` tag to the relevant scenarios and run:
-```
-$ npm run test-watch
-```
-
 ...or build and run with Maven:
 ```
 $ mvn clean verify -f ftest/pom.xml
 ```
+
+### Releases
+
+Major releases (new features):
+
+```
+gulp release:major
+```
+
+Minor releases (small improvements and bugfixes):
+```
+gulp release
+```
+
 
 # Contributing / Reporting issues
 
