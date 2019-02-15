@@ -21,6 +21,29 @@ const studioExt = window.studioExt = window.studioExt || {};
 
 let dependencies;
 
+let CONNECT_DOMAIN = 'connect.nuxeo.com';
+let CONNECT_URL = `https://${CONNECT_DOMAIN}`;
+
+chrome.storage.sync.get('value', (res) => {
+  if (res.value && res.value.length > 0) {
+    CONNECT_DOMAIN = res.value;
+    CONNECT_URL = `https://${CONNECT_DOMAIN}`;
+  } else {
+    CONNECT_DOMAIN = 'connect.nuxeo.com';
+    CONNECT_URL = `https://${CONNECT_DOMAIN}`;
+  }
+});
+
+const setStudioUrl = window.setStudioUrl = (domain, cb) => {
+  return chrome.storage.sync.set({ value: domain }, () => {
+    CONNECT_DOMAIN = domain;
+    CONNECT_URL = `https://${CONNECT_DOMAIN}`;
+    if (cb) {
+      cb();
+    }
+  });
+}
+
 const notification = window.notification = (idP, titleP, messageP, img, interaction, clickHandler) => {
   const click = clickHandler;
   try {

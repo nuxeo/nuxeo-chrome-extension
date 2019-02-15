@@ -116,14 +116,7 @@ limitations under the License.
       const studioUrl = `${bkg.CONNECT_URL}/nuxeo/site/studio/ide?project=${packageName}`;
       $('#designer-livepreview-login').attr('href', studioUrl);
       $('#studio').click(() => {
-        let connectUrl = 'https://connect.nuxeo.com/';
-        chrome.storage.sync.get('value', (res) => {
-          if (res.value && res.value.length > 0) {
-            connectUrl = res.value;
-          }
-          const studioUrl = `${connectUrl}nuxeo/site/studio/ide?project=${pkgName}`;
-          app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
-        });
+        app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
       });
       $('#hot-reload-button').click(() => {
         bkg.bkgHotReload(startLoadingHR, stopLoading, true, showDependencyError);
@@ -206,14 +199,9 @@ limitations under the License.
         $('#connect-url').toggle();
       });
 
-      chrome.storage.sync.get('value', (res) => {
-        if (res.value && res.value.length > 0) {
-          $('#logo').css('background-image', 'url("../images/nuxeo-contrast.png")');
-          $('#connect-url-input').val(res.value);
-        } else {
-          $('#logo').css('background-image', 'url("../images/nuxeo_block-30.png")');
-        }
-      });
+      if (bkg.CONNECT_DOMAIN !== 'connect.nuxeo.com') {
+        $('#connect-url-input').val(bkg.CONNECT_DOMAIN);
+      }
 
       chrome.storage.sync.get('highlight', (res) => {
         if (res.highlight !== undefined) {
@@ -233,10 +221,7 @@ limitations under the License.
         const input = $('#connect-url-input').val();
         const highlight = $('#highlight-input').prop('checked');
         if (input.length > 0) {
-          chrome.storage.sync.set({ value: input }, () => {
-            $('#logo').css('background-image', 'url("../images/nuxeo-contrast.png")');
-            $('#save').hide();
-            $('#reset').show();
+          bkg.setStudioUrl(input, () => {
             $('#connect-url').hide();
           });
         }
@@ -252,12 +237,11 @@ limitations under the License.
           confirmButton: 'Reset',
           cancelButton: 'Cancel',
           confirm: () => {
-            chrome.storage.sync.clear(() => {
-              $('#logo').css('background-image', 'url("../images/nuxeo_block-30.png")');
-              $('#save').show();
-              $('#reset').hide();
+            bkg.setStudioUrl('connect.nuxeo.com', () => {
               $('#connect-url-input').val('');
               $('#connect-url').hide();
+            });
+            chrome.storage.sync.set({ highlight: true }, () => {
               $('#highlight-input').prop('checked', true);
             });
           },

@@ -14,10 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// FIXME set to prod URL
-const CONNECT_DOMAIN = 'nos-dev01-connect.nos.nuxeo.com';
-const CONNECT_URL = `https://${CONNECT_DOMAIN}`;
-
 let redirectedUrls = {};
 const storeRedirectedUrlsLocally = (baseUrl, json) => {
   Object.keys(json).forEach((basePath) => {
