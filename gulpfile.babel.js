@@ -443,7 +443,7 @@ gulp.task('watch:tasks', (done) => {
     'app/vendor.babel/**/*.js',
     'app/scripts.babel/*.js',
     'app/scripts.babel/bkg/*.js'
-  ]).on('change', gulp.series('build:base', 'build:chrome'));
+  ]).on('change', gulp.series('clean', 'build:base', 'build:chrome'));
   gulp.watch([
     'dist/chrome/**/'
   ]).on('change', function () {
