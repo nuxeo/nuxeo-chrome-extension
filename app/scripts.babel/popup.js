@@ -147,39 +147,45 @@ limitations under the License.
         if (res.value && res.value.length > 0) {
           $('#logo').css('background-image', 'url("../images/nuxeo-contrast.png")');
           $('#connect-url-input').val(res.value);
-          $('#save').hide();
-          $('#reset').show();
         } else {
           $('#logo').css('background-image', 'url("../images/nuxeo_block-30.png")');
-          $('#save').show();
-          $('#reset').hide();
+        }
+      });
+
+      chrome.storage.sync.get('highlight', (res) => {
+        if (res.highlight !== undefined) {
+          if (res.highlight) {
+            $('#highlight-input').prop('checked', true);
+          } else {
+            $('#highlight-input').prop('checked', false);
+          }
+        } else {
+          chrome.storage.sync.set({ highlight: true }, () => {
+            $('#highlight-input').prop('checked', true);
+          });
         }
       });
 
       $('#save').click(() => {
         const input = $('#connect-url-input').val();
+        const highlight = $('#highlight-input').prop('checked');
         if (input.length > 0) {
-          $.confirm({
-            title: 'Change Connect URL',
-            text: `Click Save to change your Connect URL to \n <span style="color:#8400FF">${input}</span>`,
-            confirmButton: 'Save',
-            cancelButton: 'Cancel',
-            confirm: () => {
-              chrome.storage.sync.set({ value: input }, () => {
-                $('#logo').css('background-image', 'url("../images/nuxeo-contrast.png")');
-                $('#save').hide();
-                $('#reset').show();
-                $('#connect-url').hide();
-              });
-            },
+          chrome.storage.sync.set({ value: input }, () => {
+            $('#logo').css('background-image', 'url("../images/nuxeo-contrast.png")');
+            $('#save').hide();
+            $('#reset').show();
+            $('#connect-url').hide();
           });
         }
+        chrome.storage.sync.set({ highlight }, () => {
+          alert('Your changes have been saved.'); // eslint-disable-line no-alert
+        });
       });
 
       $('#reset').click(() => {
         $.confirm({
-          title: 'Reset Connect URL',
-          text: 'Click Reset to reset your Connect URL to <span style="color:#8400FF">https://connect.nuxeo.com/</span>',
+          title: 'Reset Options',
+          text: 'Click Reset to reset all options to default settings.',
           confirmButton: 'Reset',
           cancelButton: 'Cancel',
           confirm: () => {
@@ -189,6 +195,7 @@ limitations under the License.
               $('#reset').hide();
               $('#connect-url-input').val('');
               $('#connect-url').hide();
+              $('#highlight-input').prop('checked', true);
             });
           },
         });
@@ -201,27 +208,41 @@ limitations under the License.
 
       function getJsonFromPath(input) {
         input = decodeURIComponent(input);
-        nuxeo.request(`/path${input}`)
-          .schemas('*')
-          .enrichers({ document: ['acls', 'permissions'] })
-          .get({ resolveWithFullResponse: true })
-          .then(res => res.json())
-          .then(openJsonWindow)
-          .catch((error) => {
-            throw new Error(error);
-          });
+        chrome.storage.sync.get('highlight', (res) => {
+          if (res.highlight) {
+            nuxeo.request(`/path${input}`)
+              .schemas('*')
+              .enrichers({ document: ['acls', 'permissions'] })
+              .get({ resolveWithFullResponse: true })
+              .then(result => result.json())
+              .then(openJsonWindow)
+              .catch((error) => {
+                throw new Error(error);
+              });
+          } else {
+            const jsonUrl = `${nuxeo._baseURL}api/v1/path${input}?enrichers.document=acls,permissions`;
+            app.browser.createTabs(jsonUrl, bkg.studioExt.server.tabId);
+          }
+        });
       }
 
       function getJsonFromGuid(input) {
-        nuxeo.request(`/id/${input}`)
-          .schemas('*')
-          .enrichers({ document: ['acls', 'permissions'] })
-          .get({ resolveWithFullResponse: true })
-          .then(res => res.json())
-          .then(openJsonWindow)
-          .catch((error) => {
-            throw new Error(error);
-          });
+        chrome.storage.sync.get('highlight', (res) => {
+          if (res.highlight) {
+            nuxeo.request(`/id/${input}`)
+              .schemas('*')
+              .enrichers({ document: ['acls', 'permissions'] })
+              .get({ resolveWithFullResponse: true })
+              .then(result => result.json())
+              .then(openJsonWindow)
+              .catch((error) => {
+                throw new Error(error);
+              });
+          } else {
+            const jsonUrl = `${nuxeo._baseURL}api/v1/id${input}?enrichers.document=acls,permissions`;
+            app.browser.createTabs(jsonUrl, bkg.studioExt.server.tabId);
+          }
+        });
       }
 
       bkg.getCurrentTabUrl((url) => {
@@ -294,6 +315,11 @@ limitations under the License.
         nuxeo.connect()
           .then((client) => {
             $('#platform-version').text(` ${client.serverVersion}`);
+            if (!client.serverVersion.gt(client.SERVER_VERSIONS.LTS_2019)) {
+              chrome.storage.sync.set({ highlight: true }, () => {
+                $('.highlight-option').hide();
+              });
+            }
           });
 
         const serverString = DOMPurify.sanitize(nuxeo._baseURL);

@@ -26,6 +26,10 @@ Features include:
   * Searches return the first 5 results in a dropdown window from the omnibox.
 * Link to our **Customer Feedback Portal** from the About page. You can vote for requested features or even suggest your own, anonymously if you wish.
 
+Click on the **Nuxeo** logo to modify options:
+* Change the Connect URL.
+* Turn off JSON highlighting to use your own JSON formatter plugin (from 10.10+).
+
 # Installation
 
 - From the Chrome Web Store: install [Nuxeo Dev Tools](https://chrome.google.com/webstore/detail/nuxeo-extension/kncphbjdicjganncpalklkllihdidcmh).

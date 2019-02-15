@@ -48,13 +48,20 @@ const notification = window.notification = (idP, titleP, messageP, img, interact
 /**
  * XXX Temp solution in order to be able to force Auth
  */
+
 const newNuxeo = window.newNuxeo = (opts) => {
   const _opts = opts || {};
   if (window.app.auth) {
     _opts.auth = window.app.auth;
   }
+  const nuxeo = new Nuxeo(_opts);
 
-  return new Nuxeo(_opts);
+  // Workaround until next release of Nuxeo JS client
+  nuxeo.SERVER_VERSIONS = Nuxeo.SERVER_VERSIONS;
+  nuxeo.SERVER_VERSIONS.LTS_2019 = nuxeo.SERVER_VERSIONS.LTS_2017;
+  nuxeo.SERVER_VERSIONS.LTS_2019.major = 10;
+  nuxeo.SERVER_VERSIONS.LTS_2019.version = '10.10';
+  return nuxeo;
 };
 
 const checkDependencies = `import groovy.json.JsonOutput;

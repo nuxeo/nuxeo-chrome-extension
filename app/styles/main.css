@@ -195,20 +195,40 @@ HEADINGS
   color: #fff;
 }
 
-.save, .reset {
+.reset {
     position: absolute;
     height: 15px;
     margin: auto;
     font-size: 15px;
     cursor: pointer;
     font-weight: normal;
-    color: #ccc;
+    color: #fff;
     right: 8px;
-    top: 4px;
+    top: 40px;
 }
 
-#reset {
-  display: none;
+.save {
+    position: absolute;
+    height: 15px;
+    margin: auto;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: normal;
+    color: #fff;
+    right: 30px;
+    top: 40px;
+}
+
+.reset:hover,
+.save:hover {
+  color: #006CFA;
+}
+
+#highlight-label {
+  height: 15px;
+  padding-top: 40px;
+  padding-left: 20px;
+  color: #006CFA;
 }
 
 #connect-url {

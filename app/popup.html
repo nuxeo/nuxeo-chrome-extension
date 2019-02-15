@@ -75,8 +75,12 @@
               <li class="server-name">Connected to Nuxeo Server<span id="platform-version"></span>:</li>
               <li><div class="server-name-url"></div></li>
               <li id="connect-url">
-                <form class="search-container">
-                  <input type="text" id="connect-url-input" class="form" placeholder="https://connect.nuxeo.com" results="5" />
+                <form class="search-container" id="options">
+                  <input type="text" id="connect-url-input" class="form" placeholder="https://connect.nuxeo.com/" results="5" />
+                  <div class="highlight-option">
+                    <input type="checkbox" id="highlight-input" class="form" name="highlight">
+                    <p id='highlight-label'>Highlight JSON</p>
+                  </div>
                   <span class="reset" id="reset">	&#128683;</span>
                   <span class="save" id="save">	&#128190;</span>
                 </form>
