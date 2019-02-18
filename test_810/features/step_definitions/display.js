@@ -32,7 +32,8 @@ Given(/^the (.+) page is open(?: on ([Ff]irefox|[Cc]hrome))?/, (page, arg) => {
       getCurrentTabUrl(() => {});
       return window.studioExt.server.url;
     }).value).to.be.equal('http://localhost:8080/nuxeo/');
-    expect(browser.getTitle()).to.equal(`${page} - Nuxeo Dev Tools`);
+    const title = browser.getTitle();
+    expect(title).to.equal(`${page} - Nuxeo Dev Tools`);
     injectMocks();
   }
   let tabIds = browser.getTabIds();
@@ -40,12 +41,14 @@ Given(/^the (.+) page is open(?: on ([Ff]irefox|[Cc]hrome))?/, (page, arg) => {
     browser.execute(() => {
       window.open('http://localhost:8080/nuxeo');
     });
+    browser.pause(500);
     tabIds = browser.getTabIds();
     browser.switchTab(tabIds[1]);
     browser.$('#username').waitForVisible();
     browser.$('#username').addValue('Administrator');
     browser.$('#password').addValue('Administrator');
     browser.$('input.login_button').click();
+    browser.pause(500);
     browser.switchTab(tabIds[0]);
   }
 });
@@ -64,7 +67,13 @@ When(/^I (see|click on) the (.+) (link|button|element)/, (action, selector, elem
   browser.waitForVisible(`#${selector}`);
   browser.pause(500);
   if (action === 'click on') {
-    browser.$(`#${selector}`).click();
+    try {
+      browser.$(`#${selector}`).click();
+    } catch (err) {
+      browser.moveToObject('#about');
+      browser.pause(500);
+      browser.$(`#${selector}`).click();
+    }
     if (!(browser.execute(() => chrome.tabs.create.called).value)) {
       expect(browser.execute(() => {
         getCurrentTabUrl(() => {});
