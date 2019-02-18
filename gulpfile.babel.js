@@ -11,6 +11,7 @@ import minimist from 'minimist';
 import moment from 'moment';
 import ms from 'merge-stream';
 import path from 'path';
+import replace from 'gulp-replace';
 import runSequence from 'run-sequence';
 import { stream as wiredep } from 'wiredep';
 import util from 'gulp-util';
@@ -22,6 +23,22 @@ const knownOptions = {
 const options = minimist(process.argv.slice(2), knownOptions);
 const $ = gulpLoadPlugins();
 const test = options.env;
+const copyrighted = [
+  'app/*.html',
+  'app/scripts.babel/*.js',
+  'app/scripts.babel/bkg/*.js',
+  'app/vendor.babel/chrome/*.js',
+  'app/vendor.babel/firefox/*.js',
+  'test/features/step_definitions/*.js',
+  'test/*.js',
+  'test_810/features/step_definitions/*.js',
+  'test_810/*.js',
+  'test_910/features/step_definitions/*.js',
+  'test_910/*.js',
+  'test_1010/features/step_definitions/*.js',
+  'test_1010/*.js',
+  './LICENSE.txt'
+]
 
 let version = '';
 
@@ -94,6 +111,21 @@ function prependScript(node, file) {
 function appendScript(node, file) {
   node.append(`<script src="${ file }"></script>`);
 }
+
+function updateCopyright(source) {
+  const year = new Date().getFullYear();
+  const dest = source.substring(0, source.lastIndexOf("/")) || './';
+  return gulp.src(source)
+    .pipe(replace(/Copyright ?(.+) Nuxeo/g, `Copyright 2016-${year} Nuxeo`))
+    .pipe(gulp.dest(dest));
+}
+
+gulp.task('copyright', function(done){
+  copyrighted.forEach((file) => {
+    return updateCopyright(file);
+  });
+  done();
+});
 
 gulp.task('lint', lint([
   'app/scripts.babel/*.js',
@@ -465,8 +497,48 @@ gulp.task('version:major', done => {
 
 gulp.task('default', gulp.series('clean', 'build'));
 
-gulp.task('package', gulp.series('build:base', gulp.parallel('package:chrome', 'package:firefox')));
+gulp.task('package',
+  gulp.series(
+    'build:base',
+    gulp.parallel(
+      'package:chrome',
+      'package:firefox'
+    )
+  )
+);
 
-gulp.task('release', gulp.series('build:base', gulp.parallel('build:chrome', 'build:firefox'), 'version:minor', 'version:chrome', gulp.parallel('zip:chrome', 'zip:firefox')));
+gulp.task('release',
+  gulp.series(
+    'clean',
+    'copyright',
+    'build:base',
+    gulp.parallel(
+      'build:chrome',
+      'build:firefox'
+    ),
+    'version:minor',
+    'version:chrome',
+    gulp.parallel(
+      'zip:chrome',
+      'zip:firefox'
+    )
+  )
+);
 
-gulp.task('release:major', gulp.series('build:base', gulp.parallel('build:chrome', 'build:firefox'), 'version:major', 'version:chrome', gulp.parallel('zip:chrome', 'zip:firefox')));
+gulp.task('release:major',
+  gulp.series(
+    'clean',
+    'copyright',
+    'build:base',
+    gulp.parallel(
+      'build:chrome',
+      'build:firefox'
+    ),
+    'version:major',
+    'version:chrome',
+    gulp.parallel(
+      'zip:chrome',
+      'zip:firefox'
+    )
+  )
+);
