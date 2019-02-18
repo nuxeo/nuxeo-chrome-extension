@@ -12,6 +12,9 @@ This project puts some of the more commonly performed actions in the Nuxeo Platf
 Features include:
 * **Hot Reload** on related Studio project
 * **Restart** server
+* **Designer Live Preview**
+  * See your Designer Web UI customizations without a hot reload -- just save in Designer and refresh your browser.
+  * HTML import [currently unavailable](https://bugs.chromium.org/p/chromium/issues/detail?id=803115) in Chrome.
 * Rebuild **Elasticsearch** Index
 * Connect to **API Playground**
 * Toggle **Automation Call Tracing**
