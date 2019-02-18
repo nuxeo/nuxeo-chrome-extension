@@ -1,4 +1,6 @@
 $(() => {
+  const date = new Date().getFullYear();
+  $('#copyright').append(`${date} Nuxeo`);
   app.browser.getBackgroundPage((bkg) => {
     $('#apache').click(() => {
       app.browser.createTabs('http://www.apache.org/licenses/LICENSE-2.0', bkg.studioExt.server.tabId);

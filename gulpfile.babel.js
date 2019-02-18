@@ -212,8 +212,6 @@ gulp.task('build:chrome:base', () => {
 
 gulp.task('build:chrome:about', () => {
   return gulp.src('dist/base/about.html').pipe(cheerio($ => {
-    const date = new Date().getFullYear();
-    $('#copyright').append(`${ date } Nuxeo`);
     $('#version').text(`Version ${ version }`);
   })).pipe(gulp.dest('dist/chrome'));
 });
@@ -293,7 +291,6 @@ gulp.task('build:sinon-chrome:about', () => {
       prependScript($head, 'scripts/background.js');
       prependScript($head, 'scripts/injecter.js');
       prependScript($head, 'scripts/sinon-chrome.min.js');
-      const date = new Date().getFullYear();
       $('#version').text(`Version ${ version }`);
     })).pipe(gulp.dest('dist/sinon-chrome'));
 });
@@ -342,8 +339,6 @@ gulp.task('build:firefox:base', () => {
 
 gulp.task('build:firefox:about', () => {
   return gulp.src('dist/base/about.html').pipe(cheerio($ => {
-    const date = new Date().getFullYear();
-    $('#copyright').append(`${ date } Nuxeo`);
     $('#version').text(`Version ${ version }`);
   })).pipe(gulp.dest('dist/firefox'));
 });
