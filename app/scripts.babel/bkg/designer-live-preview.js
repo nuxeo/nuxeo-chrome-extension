@@ -120,4 +120,5 @@ window.designerLivePreview = {
   enable,
   disable,
   isEnabled,
+  redirectedUrls,
 };

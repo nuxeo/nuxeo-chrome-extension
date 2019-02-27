@@ -37,6 +37,8 @@
     '$': true,
     'app': true,
     'browser': true,
+    'connectUsr': true,
+    'connectPsw': true,
     'disableTabExtension': true,
     'expect': true,
     'fixtures': true,

@@ -16,11 +16,13 @@ limitations under the License.
 
 const { Given, Then, When } = require('cucumber');
 const chai = require('chai');
+const login = require('./support/fixtures/auth.js').login;
+const modifyDashboard = require('./support/client.js').modifyDashboard;
+const AfterAll = require('./support/hooks.js').AfterAll;
 
 const assert = chai.assert;
 const expect = chai.expect;
 const should = chai.should();
-const nxPath = 'http://localhost:8080/nuxeo';
 
 Then(/^I am taken to my Studio project/, () => {
   const tabIds = browser.getTabIds();
@@ -32,48 +34,30 @@ Then(/^I am taken to my Studio project/, () => {
   }
 });
 
-When(/I have a (.+) document in Nuxeo/, (docType) => {
-  docType = docType || 'File';
-  const doc = fixtures.documents.init(docType);
-  return fixtures.documents.create('/default-domain/', doc).then((d) => {
-    this.doc = d;
-  });
+Then(/^I navigate to (.+) from the (.+) heading in Designer/, (page, heading) => {
+  const url = `https://connect.nuxeo.com/nuxeo/designer/#/bde-test/ui/${page.toLowerCase()}`;
+  browser.url(url);
+  browser.pause(1000);
+  const title = browser.getTitle();
+  expect(title.should.be.equal(`${page} - ${heading}`));
 });
 
-When(/^I navigate to the document/, () => {
-  browser.url(`${nxPath}/ui/#!/browse${this.doc.path}`);
-});
-
-When(/^I try to create a document/, () => {
-  browser.waitForShadowDomElement(['html body nuxeo-app', 'nuxeo-document-create-button', '#tray #createBtn'], 5000);
-  browser.shadowDomElement(['html body nuxeo-app', 'nuxeo-document-create-button', '#tray #createBtn']).click();
-});
-
-Then(/^I (can't )?see the (.+) document type/, (notVisible, docType) => {
-  browser.waitForShadowDomElement(['html body nuxeo-app', 'nuxeo-document-create-popup', '#createDocDialog']);
-  const customDocType = browser.shadowDomElement(['html body nuxeo-app',
-    'nuxeo-document-create-popup', '#createDocDialog #holder iron-pages #simpleCreation',
-    `iron-pages .vertical .container paper-dialog-scrollable paper-button[name="${docType}"]`]).value;
-  if (notVisible) {
-    const tabIds = browser.getTabIds();
-    browser.switchTab(tabIds[0]);
-    return expect(customDocType).to.equal(null);
-  } else {
-    const tabIds = browser.getTabIds();
-    browser.switchTab(tabIds[0]);
-    return expect(customDocType).to.exist;
-  }
-});
-
-Then(/^the Nuxeo page refreshes/, () => {
-  browser.waitUntil(() => browser.execute(() => chrome.tabs.reload.called).value, 20000);
-  const tabIds = browser.getTabIds();
-  for (let i = 0; i < tabIds.length; i += 1) {
-    if (browser.getTitle().indexOf('Nuxeo Platform') === -1) {
-      browser.switchTab(tabIds[i]);
-    } else {
-      return browser.refresh();
+When(/^I (see|click on) the Designer customize button/, (action) => {
+  try {
+    browser.waitForShadowDomElement(['body nuxeo-view-designer', '#dashboard', '#featureEditor div.editor.layout.horizontal div paper-button']);
+    if (action === 'click on') {
+      browser.shadowDomElement(['body nuxeo-view-designer', '#dashboard', '#featureEditor div.editor.layout.horizontal div paper-button']).click();
     }
+  } catch {
+    // Customize button is only available once
   }
-  return browser.refresh();
 });
+
+When(/^I (see|click on) the Designer save button/, (action) => {
+  browser.waitForShadowDomElement(['body nuxeo-view-designer', '#dashboard', '#featureEditor > div:nth-child(1) > nuxeo-editor-save-button', '#saveButton']);
+  if (action === 'click on') {
+    browser.shadowDomElement(['body nuxeo-view-designer', '#dashboard', '#featureEditor > div:nth-child(1) > nuxeo-editor-save-button', '#saveButton']).click();
+  }
+});
+
+When(/^I modify the Dashboard/, () => modifyDashboard(connectUsr, connectPsw));

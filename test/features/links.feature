@@ -1,10 +1,10 @@
 Feature: Links
 
   Scenario Outline: Useful Links
-    Given the Popup page is open
+    Given the Popup extension page is open
     When I hover on the Useful Links element
-    Then I see the dropdown content element
-    When I click on the <name> link
+    Then I see the extension dropdown content element
+    When I click on the extension <name> link
     Then the <title> page opens
 
     Examples:
@@ -21,14 +21,14 @@ Feature: Links
       | Automation Doc     | Nuxeo Automation Documentation                                                     |
 
  # Scenario: Studio button
- #    Given the Popup page is open
+ #    Given the Popup extension page is open
  #    And I have a valid Studio project
- #    When I click on the Studio button
+ #    When I click on the extension Studio button
 
   Scenario: API Playground link
-    Given the Popup page is open
+    Given the Popup extension page is open
     # And I have CORS configuration
     And I hover on the Useful Links element
-    When I click on the API Playground link
+    When I click on the extension API Playground link
     Then the Nuxeo API Playground page opens
     And I am connected to API Playground on http://localhost:8080/nuxeo

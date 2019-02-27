@@ -29,6 +29,7 @@
     "list-directory-contents": "0.0.3",
     "merge-stream": "^1.0.1",
     "moment": "^2.24.0",
+    "request-promise": "^4.2.4",
     "run-sequence": "^2.2.1",
     "wdio-cucumber-framework": "^2.2.8",
     "wdio-multiple-cucumber-html-reporter": "^0.3.3",

@@ -473,6 +473,23 @@ gulp.task('watch:tasks', (done) => {
   done();
 });
 
+gulp.task('watch:lint', (done) => {
+  $.livereload.listen();
+  gulp.watch([
+    'app/*.html',
+    'app/libs/**/*.js',
+    'app/images/**/*',
+    'app/styles/**/*',
+    'app/_locales/**/*.json',
+    'app/vendor.babel/**/*.js',
+    'app/scripts.babel/*.js',
+    'app/scripts.babel/bkg/*.js',
+    'test*/features/step_definitions/*.js',
+    'test*/features/step_definitions/support/**/*.js'
+  ]).on('change', gulp.series('lint'));
+  done();
+})
+
 gulp.task('watch', gulp.series('build:base', 'build:chrome', 'watch:tasks'));
 
 gulp.task('package:chrome', gulp.series('build:chrome', 'zip:chrome'));

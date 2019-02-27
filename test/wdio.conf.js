@@ -1,12 +1,4 @@
-const Nuxeo = require('nuxeo');
-const nuxeo = new Nuxeo({
-  baseURL: 'http://localhost:8080/nuxeo/',
-  auth: {
-    method: 'basic',
-    username: 'Administrator',
-    password: 'Administrator'
-  }
-});
+const nuxeo = require('./features/step_definitions/support/client.js').nuxeo;
 const path = require('path');
 
 exports.config = {
@@ -103,7 +95,7 @@ exports.config = {
     baseUrl: 'http://localhost:8080/nuxeo',
     //
     // Default timeout for all waitFor* commands.
-    waitforTimeout: 40000,
+    waitforTimeout: 20000,
     //
     // Default timeout in milliseconds for request
     // if Selenium Grid doesn't send response
@@ -208,34 +200,9 @@ exports.config = {
      */
     beforeSession: function (config, capabilities, specs) {
       const chrome = require('sinon-chrome');
-      global.chrome = chrome;
-      global.fixtures = {};
       global.liveDocuments = [];
-      global.users = {
-        Administrator: 'Administrator',
-      };
-
-      fixtures.documents = {
-        init: (docType) => {
-          const title = `My_${docType}`;
-          const doc = {
-            'entity-type': 'document',
-            name: title.replace(/[^a-z0-9.]/gi, '_'),
-            type: docType.trim(),
-            properties: {
-              'dc:title': title,
-            },
-          };
-          return doc;
-        },
-        create: (parent, document) => nuxeo.repository().create(parent, document).then((doc) => {
-          liveDocuments.push(doc.path);
-          return doc;
-        }),
-        delete: docPath => nuxeo.repository().delete(docPath).then(() => {
-          liveDocuments.splice(liveDocuments.indexOf(docPath), 1);
-        }),
-      };
+      global.connectUsr = process.env.connectUsr;
+      global.connectPsw = process.env.connectPsw;
 
       // Assume we are always working on localhost:8080
       chrome.tabs.query.yields([{
@@ -275,6 +242,7 @@ exports.config = {
        * @param {string|Array<string>} selectors
        * @return {?Element}
        */
+
       function findInShadowDom(selectors) {
         let selectorsArray = [];
         if (!Array.isArray(selectors)) {
@@ -365,27 +333,22 @@ exports.config = {
      * @param {Object} scenario scenario details
      */
     afterScenario: function (scenario) {
-      // Close extra tabs
-      const tabIds = browser.getTabIds();
-      if (tabIds.length > 2) {
-        for (let i = 2; i < tabIds.length; i += 1) {
-          browser.switchTab(tabIds[i]);
-          browser.close();
-        }
-      }
-
       // Delete all documents
       const userWorkspaces = '/default-domain/UserWorkspaces/';
       return Promise.all(liveDocuments
         .filter(doc => path.dirname(doc) === '/default-domain')
         .map(doc => {
-          nuxeo.repository().delete(doc);
+          nuxeo.repository().delete(doc).catch((err) => {
+            console.log(err);
+          });
         }))
         .then(() => {
-          liveDocuments = [];
+          return liveDocuments = [];
         })
         .then(() => {
-          return nuxeo.repository().delete(userWorkspaces).catch(() => {});
+          return nuxeo.repository().delete(userWorkspaces).catch((err) => {
+            // No user workspaces
+          });
         });
     },
     /**

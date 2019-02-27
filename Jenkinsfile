@@ -29,12 +29,16 @@ node(env.SLAVE) {
                 }
 
                 stage ('build and test') {
-
-                    def jdk = tool name: 'java-8-oracle'
-                    env.JAVA_HOME = "${jdk}"
-                    def mvnHome = tool name: 'maven-3.3', type: 'hudson.tasks.Maven$MavenInstallation'
-                    sh "set +x; echo ${env.CLID}  | sed 's/--/\\n/' >${env.RESOURCES_PATH}/instance.clid"
-                    sh "${mvnHome}/bin/mvn clean verify -f ${env.POM_PATH}"
+                    withCredentials([usernamePassword(
+                        credentialsId: 'bde-connect-creds-ft',
+                        passwordVariable: 'CONNECT_CREDS_PSW',
+                        usernameVariable: 'CONNECT_CREDS_USR')]) {
+                            def jdk = tool name: 'java-8-oracle'
+                            env.JAVA_HOME = "${jdk}"
+                            def mvnHome = tool name: 'maven-3.3', type: 'hudson.tasks.Maven$MavenInstallation'
+                            sh "set +x; echo ${env.CLID}  | sed 's/--/\\n/' >${env.RESOURCES_PATH}/instance.clid"
+                            sh "${mvnHome}/bin/mvn clean verify -f ${env.POM_PATH} -DconnectUsr=${env.CONNECT_CREDS_USR} -DconnectPsw=${env.CONNECT_CREDS_PSW}"
+                    }
                 }
 
                 stage ('post build') {

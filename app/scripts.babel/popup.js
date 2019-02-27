@@ -106,31 +106,31 @@ limitations under the License.
       $('#studio-buttons').css('display', 'block');
 
       if (bkg.designerLivePreview.isEnabled()) {
-        $('#designer-livepreview-button').addClass('enabled');
-        $('#designer-livepreview-button').removeClass('disabled');
+        $('#designer-live-preview-button').addClass('enabled');
+        $('#designer-live-preview-button').removeClass('disabled');
       } else {
-        $('#designer-livepreview-button').addClass('disabled');
-        $('#designer-livepreview-button').removeClass('enabled');
+        $('#designer-live-preview-button').addClass('disabled');
+        $('#designer-live-preview-button').removeClass('enabled');
       }
 
       const studioUrl = `${bkg.CONNECT_URL}/nuxeo/site/studio/ide?project=${packageName}`;
-      $('#designer-livepreview-login').attr('href', studioUrl);
+      $('#log-into-studio').attr('href', studioUrl);
       $('#studio').click(() => {
         app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
       });
       $('#hot-reload-button').click(() => {
         bkg.bkgHotReload(startLoadingHR, stopLoading, true, showDependencyError);
       });
-      $('#designer-livepreview-button').click(() => {
+      $('#designer-live-preview-button').click(() => {
         if (bkg.designerLivePreview.isEnabled()) {
           bkg.designerLivePreview.disable();
-          $('#designer-livepreview-button').removeClass('enabled');
-          $('#designer-livepreview-button').addClass('disabled');
+          $('#designer-live-preview-button').removeClass('enabled');
+          $('#designer-live-preview-button').addClass('disabled');
         } else {
           bkg.designerLivePreview.enable(packageName, bkg.studioExt.server.url)
             .then(() => {
-              $('#designer-livepreview-button').addClass('enabled');
-              $('#designer-livepreview-button').removeClass('disabled');
+              $('#designer-live-preview-button').addClass('enabled');
+              $('#designer-live-preview-button').removeClass('disabled');
             })
             .catch(() => {
               $('#designer-livepreview-message').css('display', 'block');

@@ -134,6 +134,10 @@
             <phase>integration-test</phase>
             <configuration>
               <arguments>run test</arguments>
+              <environmentVariables>
+                <connectUsr>${connectUsr}</connectUsr>
+                <connectPsw>${connectPsw}</connectPsw>
+              </environmentVariables>
             </configuration>
           </execution>
         </executions>
