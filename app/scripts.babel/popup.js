@@ -116,7 +116,7 @@ limitations under the License.
       const studioUrl = `${bkg.CONNECT_URL}/nuxeo/site/studio/ide?project=${packageName}`;
       $('#log-into-studio').attr('href', studioUrl);
       $('#studio').click(() => {
-        app.browser.createTabs(studioUrl, bkg.studioExt.server.tabId);
+        app.browser.createTabs(`${bkg.CONNECT_URL}/nuxeo/site/studio/ide?project=${packageName}`, bkg.studioExt.server.tabId);
       });
       $('#hot-reload-button').click(() => {
         bkg.bkgHotReload(startLoadingHR, stopLoading, true, showDependencyError);

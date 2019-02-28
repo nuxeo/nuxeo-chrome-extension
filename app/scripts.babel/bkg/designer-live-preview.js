@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 let redirectedUrls = {};
+let nuxeoBaseUrl = 'http://localhost:8080/nuxeo/';
 const storeRedirectedUrlsLocally = (baseUrl, json) => {
   Object.keys(json).forEach((basePath) => {
     const nuxeoInstanceBasePath = basePath.replace(/^\/(nuxeo\.war\/?\/)?/, '');
@@ -75,17 +76,52 @@ const addCookieHeaderForConnectRequest = (details) => {
     });
 };
 
+const addNewResources = (details) => {
+  if (details.method === 'POST') {
+    const resourcePaths = details.requestBody.formData.path;
+    return resourcePaths.forEach((resourcePath) => {
+      resourcePath = resourcePath.replace(/\/\//, '/');
+      const connectResource = `${details.url}${resourcePath}`;
+      resourcePath = resourcePath.replace(/^\/(nuxeo\.war\/?\/)?/, '');
+      const nuxeoResource = `${nuxeoBaseUrl}${resourcePath}`;
+      if (!(nuxeoResource in redirectedUrls)) {
+        redirectedUrls[nuxeoResource] = connectResource;
+        console.log(`New resource added: ${resourcePath}`);
+      }
+    });
+  }
+}
+
+const revertToDefault = (details) => {
+  if (details.method === 'DELETE') {
+    const key = Object.keys(redirectedUrls).find(key => redirectedUrls[key] === details.url);
+    if (key) {
+      delete redirectedUrls[key];
+      console.log(`Reverted to default: ${key}`);
+    }
+  }
+};
+
 const enable = (projectName, nuxeoInstanceBaseUrl) => {
   // URL's port is not allowed in urlPattern, thus had to be removed.
+  nuxeoBaseUrl = nuxeoInstanceBaseUrl;
   const urlPattern = `${nuxeoInstanceBaseUrl.replace(/:\d+/, '')}*`;
 
   browser.webRequest.onBeforeRequest.addListener(redirectRequestToConnectIfNeeded, {
     urls: [urlPattern],
   }, ['blocking']);
 
+  browser.webRequest.onBeforeRequest.addListener(addNewResources, {
+    urls: [`${CONNECT_URL}/nuxeo/site/studio/v2/project/${projectName}/workspace/ws.resources`],
+  }, ['requestBody']);
+
   browser.webRequest.onBeforeSendHeaders.addListener(addCookieHeaderForConnectRequest, {
     urls: [`${CONNECT_URL}/*`],
   }, ['blocking', 'requestHeaders']);
+
+  browser.webRequest.onCompleted.addListener(revertToDefault, {
+    urls: [`${CONNECT_URL}/*`],
+  }, ['responseHeaders']);
 
   // fetch available resources from Studio Project
   return fetch(`${CONNECT_URL}/nuxeo/site/studio/v2/project/${projectName}/workspace/ws.resources`, {
@@ -106,7 +142,9 @@ const enable = (projectName, nuxeoInstanceBaseUrl) => {
 const disable = () => new Promise((resolve, reject) => {
   console.log('Disabling Designer Live Preview');
   browser.webRequest.onBeforeRequest.removeListener(redirectRequestToConnectIfNeeded);
+  browser.webRequest.onBeforeRequest.removeListener(revertToDefault);
   browser.webRequest.onBeforeSendHeaders.removeListener(addCookieHeaderForConnectRequest);
+  browser.webRequest.onCompleted.removeListener(addNewResources);
   redirectedUrls = {};
   resolve();
 });
