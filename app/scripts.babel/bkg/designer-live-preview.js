@@ -76,7 +76,9 @@ const addCookieHeaderForConnectRequest = (details) => {
     });
 };
 
+
 const addNewResources = (details) => {
+  // Detects when Studio users save changes to a new resource in Designer
   if (details.method === 'POST') {
     const resourcePaths = details.requestBody.formData.path;
     return resourcePaths.forEach((resourcePath) => {
@@ -84,6 +86,7 @@ const addNewResources = (details) => {
       const connectResource = `${details.url}${resourcePath}`;
       resourcePath = resourcePath.replace(/^\/(nuxeo\.war\/?\/)?/, '');
       const nuxeoResource = `${nuxeoBaseUrl}${resourcePath}`;
+      // If there is no redirected URL to the customized resource yet, add one
       if (!(nuxeoResource in redirectedUrls)) {
         redirectedUrls[nuxeoResource] = connectResource;
         console.log(`New resource added: ${resourcePath}`);
@@ -93,8 +96,10 @@ const addNewResources = (details) => {
 }
 
 const revertToDefault = (details) => {
+  // Detects when Studio users revert their customizations to default
   if (details.method === 'DELETE') {
     const key = Object.keys(redirectedUrls).find(key => redirectedUrls[key] === details.url);
+    // Removes redirected URLs to reverted customizations to avoid 404 in Web UI on refresh
     if (key) {
       delete redirectedUrls[key];
       console.log(`Reverted to default: ${key}`);
