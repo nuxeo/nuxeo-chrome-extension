@@ -104,7 +104,6 @@ limitations under the License.
       $('#no-studio-buttons').css('display', 'none');
       $('#studio').css('display', 'flex');
       $('#studio-buttons').css('display', 'block');
-
       if (bkg.designerLivePreview.isEnabled()) {
         $('#designer-live-preview-button').addClass('enabled');
         $('#designer-live-preview-button').removeClass('disabled');
@@ -193,6 +192,10 @@ limitations under the License.
     $(document).ready(() => {
       if (app.browser.name === 'Firefox') {
         adjustStorageButtons();
+      }
+      // BDE-187: Hide the Designer Live Preview button if the current browser is not Firefox
+      if (app.browser.name !== 'Firefox') {
+        $('#designer-livepreview').hide();
       }
 
       $('#searchclear').click(() => {
